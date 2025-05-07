@@ -16,7 +16,7 @@ const HeroSection: React.FC = () => {
   };
 
   const handleLearnMore = () => {
-    navigate('/services'); // Navigates to ServicesOverview page
+    navigate('/about-us'); // Navigates to About Us page
   };
 
   return (
