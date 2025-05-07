@@ -58,7 +58,7 @@ const ContactPage = () => {
                       href="mailto:info@iqsolutions.com" 
                       className="text-gray-600 hover:text-primary-600 transition-colors text-lg"
                     >
-                      info@iqsolutions.com
+                      info@iqsindia.in
                     </a>
                   </div>
                 </li>
@@ -70,7 +70,7 @@ const ContactPage = () => {
                   <div>
                     <p className="font-medium text-gray-800">Address</p>
                     <p className="text-gray-600 text-lg">
-                      Preet Vihar, New Delhi, 110092, India
+                      32, DDA Market,Preet Vihar, New Delhi, 110092, India
                     </p>
                     <Link 
                       to="https://maps.google.com" 

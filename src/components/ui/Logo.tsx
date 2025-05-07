@@ -8,7 +8,7 @@ const Logo: React.FC<LogoProps> = ({ className = '' }) => {
   return (
     <div className={`flex items-center ${className}`}>
       <img 
-        src="/src/assets/iqs-logo.png"
+        src="/src/assets/Logo.jpg"
         alt="IQS - Integrated Quality Solutions" 
         className="h-full w-auto"
       />

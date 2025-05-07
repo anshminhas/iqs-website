@@ -20,21 +20,6 @@ const ContactForm: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Google Form configuration
-  const GOOGLE_FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSevxvIM1desV5aZ2i9I4VFxNFBBNWQNlmtWvjniT0cxEF9Nzw/formResponse';
-  const FIELD_IDS = {
-    name: 'entry.2005620554',        // Name
-    email: 'entry.1045781291',       // Email
-    phone: 'entry.1166974658',       // Phone Number
-    company: 'entry.1065046570',     // Company Name
-    subject: 'entry.839337160',      // Subject dropdown
-    message: 'entry.347298601',      // Message
-    hrPlan: 'entry.538307506',      // HR Services Plan
-    verificationType: 'entry.2106714923', // Verification Type
-    recruitmentType: 'entry.2136940963',  // Recruitment Type
-    customRequirements: 'entry.1225985381' // Custom Requirements
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -59,20 +44,14 @@ const ContactForm: React.FC = () => {
     setError(null);
 
     try {
-      const formPayload = new URLSearchParams();
-      
-      // Add all fields including empty ones (Google Forms expects all fields)
-      Object.entries(FIELD_IDS).forEach(([fieldName, fieldId]) => {
-        formPayload.append(fieldId, formData[fieldName as keyof typeof formData] || '');
-      });
-
-      const response = await fetch(GOOGLE_FORM_ACTION, {
+      // Replace with your Google Apps Script URL
+      const response = await fetch('https://script.google.com/macros/s/AKfycbyo_g-kctpWxwU0F0lYYOq-u73MkOTYVBDJRXAx3HjdTzO5h-In4XpErBvzvrycoufZ4w/exec', {
         method: 'POST',
-        body: formPayload,
-        mode: 'no-cors',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+        mode: 'no-cors'
       });
 
       setSubmitted(true);
@@ -231,8 +210,8 @@ const ContactForm: React.FC = () => {
                     <h4 className="font-medium text-gray-900">{plan}</h4>
                     <p className="text-sm text-gray-600 mt-1">
                       {plan === 'Basic' && 'Essential HR support'}
-                      {plan === 'Standard' && 'Comprehensive HR solutions'}
-                      {plan === 'Premium' && 'Full-service HR partnership'}
+                      {plan === 'Standard' && 'Standard HR solutions'}
+                      {plan === 'Premium' && 'Full-service HR solutions'}
                       {plan === 'Custom' && 'Tailored to your needs'}
                     </p>
                   </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Linkedin, Facebook, Twitter } from 'lucide-react';
-import Logo from '../ui/Logo';
+import Logo from '../ui/Logo.tsx';
 
 const Footer: React.FC = () => {
   return (
@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
           <div className="space-y-6">
             <Logo className="h-12 mb-4" />
             <p className="text-secondary-100 max-w-xs">
-              Providing top-tier HR, recruitment, and verification services to businesses since 2010.
+              Providing top-tier HR, recruitment, and verification services to businesses. Enhancing their operations by innovative and high-tech techniques.
             </p>
             <div className="flex space-x-4">
               <a
@@ -106,7 +106,7 @@ const Footer: React.FC = () => {
               <li className="flex">
                 <MapPin className="mr-3 h-5 w-5 text-secondary-300 flex-shrink-0" />
                 <span className="text-secondary-100">
-                  Preet Vihar, Delhi<br />New Delhi, 110092
+                  32 ,DDA Market,Preet Vihar, Delhi<br />New Delhi, 110092
                 </span>
               </li>
               <li className="flex">
@@ -118,7 +118,7 @@ const Footer: React.FC = () => {
               <li className="flex">
                 <Mail className="mr-3 h-5 w-5 text-secondary-300 flex-shrink-0" />
                 <a href="mailto:info@iqsolutions.com" className="text-secondary-100 hover:text-white transition-colors">
-                  anshminhas8@gmail.com
+                  info@iqsindia.in
                 </a>
               </li>
             </ul>

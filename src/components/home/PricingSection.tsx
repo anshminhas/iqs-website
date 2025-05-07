@@ -6,9 +6,9 @@ const PricingSection: React.FC = () => {
   const plans = [
     {
       title: "Basic",
-      price: "Rs.10,000",
-      period: "/month",
-      description: "Per 20 Employees",
+      price: "",
+      period: "",
+      description: "",
       features: [
         "Payroll Processing",
         "Employee Onboarding",
@@ -21,9 +21,9 @@ const PricingSection: React.FC = () => {
     },
     {
       title: "STANDARD",
-      price: "Rs.15,000",
-      period: "/month",
-      description: "Per 20 Employees",
+      price: "",
+      period: "",
+      description: "",
       features: [
         "Everything in Basic+",
         "Full Employee Lifecycle Management",
@@ -37,8 +37,8 @@ const PricingSection: React.FC = () => {
     },
     {
       title: "Premium",
-      price: "Rs30,000",
-      period: "/month ONWARDS",
+      price: "",
+      period: "",
       description: "For enterprises with Dedicated HR",
       features: [
         "Everything in Standard+",
@@ -72,7 +72,7 @@ const PricingSection: React.FC = () => {
               description={plan.description}
               features={plan.features}
               popular={plan.popular}
-              buttonText="Get Started"
+              buttonText="Get QUOTE"
               buttonLink="/contact"
             />
           ))}

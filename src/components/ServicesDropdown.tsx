@@ -5,23 +5,35 @@ const ServicesDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside or when a link is clicked
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, []);
 
+  // Toggle dropdown with better mobile handling
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <div className="relative group" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef}>
       <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 relative group"
+        onClick={toggleDropdown}
+        onTouchEnd={toggleDropdown} // Added for better touch support
+        className="flex items-center gap-1 px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 relative"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         <span className="relative z-10">Services</span>
         <div className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
@@ -40,16 +52,24 @@ const ServicesDropdown: React.FC = () => {
         <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-primary-600 transition-all duration-300 ${isOpen ? 'scale-x-100' : 'scale-x-0'}`} />
       </button>
       
-      {/* Dropdown menu */}
-      <div className={`absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-2xl z-20 overflow-hidden transition-all duration-300 origin-top ${isOpen ? 'scale-y-100 opacity-100' : 'scale-y-95 opacity-0 pointer-events-none'}`}
-           style={{
-             boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-           }}>
+      {/* Dropdown menu with mobile optimizations */}
+      <div 
+        className={`
+          absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-2xl z-20 overflow-hidden 
+          transition-all duration-300 origin-top 
+          ${isOpen ? 'scale-y-100 opacity-100' : 'scale-y-95 opacity-0 pointer-events-none'}
+          md:shadow-lg
+        `}
+        style={{
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+        }}
+      >
         <div className="py-2 space-y-1">
           <Link
             to="/hr-services"
             className="block px-6 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-all duration-200 group relative"
             onClick={() => setIsOpen(false)}
+            onTouchEnd={() => setIsOpen(false)} // Added for touch devices
           >
             <span className="absolute left-0 top-0 h-full w-1 bg-primary-600 transition-all duration-200 scale-y-0 group-hover:scale-y-100" />
             <span className="relative z-10 flex items-center">
@@ -64,6 +84,7 @@ const ServicesDropdown: React.FC = () => {
             to="/recruitment-manpower"
             className="block px-6 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-all duration-200 group relative"
             onClick={() => setIsOpen(false)}
+            onTouchEnd={() => setIsOpen(false)}
           >
             <span className="absolute left-0 top-0 h-full w-1 bg-primary-600 transition-all duration-200 scale-y-0 group-hover:scale-y-100" />
             <span className="relative z-10 flex items-center">
@@ -78,6 +99,7 @@ const ServicesDropdown: React.FC = () => {
             to="/rcu-verification"
             className="block px-6 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-all duration-200 group relative"
             onClick={() => setIsOpen(false)}
+            onTouchEnd={() => setIsOpen(false)}
           >
             <span className="absolute left-0 top-0 h-full w-1 bg-primary-600 transition-all duration-200 scale-y-0 group-hover:scale-y-100" />
             <span className="relative z-10 flex items-center">
