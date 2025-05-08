@@ -63,7 +63,7 @@ const ContactSection: React.FC = () => {
                   <div>
                     <p className="font-semibold text-gray-800">Address</p>
                     <p className="text-gray-600 text-lg">
-                      32, DDA Market,Preet Vihar, New Delhi, 110092, India
+                      32, DDA Market,Defence enclave,Preet Vihar, New Delhi, 110092, India
                     </p>
                     <Link 
                       to="https://maps.google.com" 

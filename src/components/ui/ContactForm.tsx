@@ -45,7 +45,7 @@ const ContactForm: React.FC = () => {
 
     try {
       // Replace with your Google Apps Script URL
-      const response = await fetch('https://script.google.com/macros/s/AKfycbyo_g-kctpWxwU0F0lYYOq-u73MkOTYVBDJRXAx3HjdTzO5h-In4XpErBvzvrycoufZ4w/exec', {
+      const response = await fetch('https://script.google.com/macros/s/AKfycby70a2QCJCTPhyw7bY3EYKseQNgWrIJuus7tR7DA94ErWsjVivPul6E0Oi7F5d_XtlmgQ/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -23,7 +23,7 @@ const AboutPage: React.FC = () => {
               About IQS
             </h1>
             <p className="text-xl md:text-2xl text-secondary-100 mb-8 leading-relaxed">
-              Welcome to INTEGRATED QUALITY SERVICES - Your trusted partner in workforce solutions
+              Welcome to INTEGRATED QUALITY SOLUTIONS - Your trusted partner in workforce solutions
             </p>
           </div>
         </div>
@@ -34,10 +34,10 @@ const AboutPage: React.FC = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold font-montserrat text-gray-900 mb-8">
-               IQS – INTIGRATED QUALITY SERVICES
+               IQS – INTIGRATED QUALITY SOLUTIONS
             </h2>
             <p className="text-lg text-gray-600 mb-6">
-             IQS – Integrated Quality Services is your trusted partner in HR outsourcing, talent acquisition, manpower deployment, and risk control verification services. Established with a clear mission to streamline and enhance workforce solutions, we combine technology-driven systems with a people-first mindset to empower growing businesses, enterprises, financial institutions, and service providers across India.
+             IQS – Integrated Quality Solutions is your trusted partner in HR outsourcing, talent acquisition, manpower deployment, and risk control verification services. Established with a clear mission to streamline and enhance workforce solutions, we combine technology-driven systems with a people-first mindset to empower growing businesses, enterprises, financial institutions, and service providers across India.
             </p>
             <p className="text-lg text-gray-600 mb-6">
              At IQS, we understand that managing people, processes, and compliance efficiently is not just a necessity—it’s a strategic advantage. That’s why we offer a full spectrum of services including end-to-end HR lifecycle management, manpower supply, recruitment process outsourcing (RPO), employee background screening, and RCU (Risk Containment Unit) verifications for banks, NBFCs, insurance companies, and corporates.</p>
