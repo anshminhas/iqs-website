@@ -20,6 +20,21 @@ const ContactForm: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Google Form configuration
+  const GOOGLE_FORM_ACTION = 'https://script.google.com/macros/s/AKfycby70a2QCJCTPhyw7bY3EYKseQNgWrIJuus7tR7DA94ErWsjVivPul6E0Oi7F5d_XtlmgQ/exec';
+  const FIELD_IDS = {
+    name: 'entry.2005620554',        // Name
+    email: 'entry.1045781291',       // Email
+    phone: 'entry.1166974658',       // Phone Number
+    company: 'entry.1065046570',     // Company Name
+    subject: 'entry.839337160',      // Subject dropdown
+    message: 'entry.347298601',      // Message
+    hrPlan: 'entry.538307506',      // HR Services Plan
+    verificationType: 'entry.2106714923', // Verification Type
+    recruitmentType: 'entry.2136940963',  // Recruitment Type
+    customRequirements: 'entry.1225985381' // Custom Requirements
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -44,14 +59,20 @@ const ContactForm: React.FC = () => {
     setError(null);
 
     try {
-      // Replace with your Google Apps Script URL
-      const response = await fetch('https://script.google.com/macros/s/AKfycby70a2QCJCTPhyw7bY3EYKseQNgWrIJuus7tR7DA94ErWsjVivPul6E0Oi7F5d_XtlmgQ/exec', {
+      const formPayload = new URLSearchParams();
+      
+      // Add all fields including empty ones (Google Forms expects all fields)
+      Object.entries(FIELD_IDS).forEach(([fieldName, fieldId]) => {
+        formPayload.append(fieldId, formData[fieldName as keyof typeof formData] || '');
+      });
+
+      const response = await fetch(GOOGLE_FORM_ACTION, {
         method: 'POST',
+        body: formPayload,
+        mode: 'no-cors',
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        mode: 'no-cors'
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       });
 
       setSubmitted(true);
@@ -211,7 +232,7 @@ const ContactForm: React.FC = () => {
                     <p className="text-sm text-gray-600 mt-1">
                       {plan === 'Basic' && 'Essential HR support'}
                       {plan === 'Standard' && 'Standard HR solutions'}
-                      {plan === 'Premium' && 'Full-service HR solutions'}
+                      {plan === 'Premium' && 'Full-service HR soluti'}
                       {plan === 'Custom' && 'Tailored to your needs'}
                     </p>
                   </div>
