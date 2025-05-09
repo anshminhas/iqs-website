@@ -208,7 +208,7 @@ const RecruitmentManpower: React.FC = () => {
             href="/contact" 
             className="inline-block px-6 py-3 bg-white text-primary-600 font-semibold rounded-md hover:bg-secondary-100 transition-colors"
           >
-            Learn More About Our Guarantee
+            Learn More 
           </a>
         </div>
       </section>

@@ -51,7 +51,7 @@ const ContactSection: React.FC = () => {
                       href="mailto:info@iqsolutions.com" 
                       className="text-gray-600 hover:text-primary-600 transition-colors text-lg"
                     >
-                      info@iqsolutions.com
+                      info@iqsindia.in
                     </a>
                   </div>
                 </li>
@@ -66,7 +66,7 @@ const ContactSection: React.FC = () => {
                       32,DDA MarketPreet Vihar, New Delhi, 110092, India
                     </p>
                     <Link 
-                      to="https://maps.google.com" 
+                      to="https://www.google.co.in/maps/place/Defence+Enclave+Market/@28.6410432,77.2815449,16z/data=!4m10!1m2!2m1!1s32,Defence+Enclave+,+dda+Market,preet+vihar!3m6!1s0x390cfb5743052565:0xa0295acac9588eec!8m2!3d28.6410432!4d77.2910721!15sCiszMixEZWZlbmNlIEVuY2xhdmUgLCBkZGEgTWFya2V0LHByZWV0IHZpaGFyWisiKTMyIGRlZmVuY2UgZW5jbGF2ZSBkZGEgbWFya2V0IHByZWV0IHZpaGFykgEGbWFya2V0qgFuEAEqGiIWZGRhIG1hcmtldCBwcmVldCB2aWhhcigAMh8QASIbuMVXTHWaTSjQxYjQtq4kW-_EqVczztHvZiw-Mi0QAiIpMzIgZGVmZW5jZSBlbmNsYXZlIGRkYSBtYXJrZXQgcHJlZXQgdmloYXLgAQA!16s%2Fg%2F11b6dbjy93?entry=ttu&g_ep=EgoyMDI1MDUwNi4wIKXMDSoJLDEwMjExNDU1SAFQAw%3D%3D" 
                       target="_blank"
                       className="text-primary-600 hover:text-primary-700 text-sm font-medium mt-1 inline-block"
                     >
