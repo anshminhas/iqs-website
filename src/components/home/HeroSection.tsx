@@ -16,28 +16,34 @@ const HeroSection: React.FC = () => {
   };
 
   const handleLearnMore = () => {
-    navigate('/about-us'); // Navigates to About Us page
+    navigate('/about-us');
   };
 
   return (
-    <section className="relative pt-20 overflow-hidden">
-      {/* Background with overlay */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center z-0" 
-        style={{ 
-          backgroundImage: 'url(https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)', 
-        }}
+    <section className="relative w-full h-screen overflow-hidden">
+      {/* ✅ Fullscreen Background Video */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        autoPlay
+        loop
+        muted
+        playsInline
       >
-        <div className="absolute inset-0 bg-primary-600 opacity-80"></div>
-      </div>
-      
-      <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24 lg:py-32">
+        <source src="/videos/hero-desktop.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* ✅ Dark Overlay */}
+      <div className="absolute inset-0 bg-black/60 z-10"></div>
+
+      {/* ✅ Hero Content */}
+      <div className="relative z-20 container mx-auto px-4 md:px-6 py-24 flex flex-col justify-center h-full">
         <div className="max-w-3xl animate-fade-in">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-montserrat text-white mb-6 leading-tight">
             Integrated High Tech Solutions for Modern Businesses
           </h1>
           <p className="text-xl md:text-2xl text-secondary-100 mb-8 leading-relaxed">
-            We provide comprehensive HR, recruitment, Manpower and verification services to help your business succeed.
+            We provide comprehensive HR, recruitment, manpower, and verification services to help your business succeed.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
