@@ -29,8 +29,30 @@ const HeroSection: React.FC = () => {
         muted
         playsInline
       >
-        <source src="/videos/hero-desktop.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
+        {/* Desktop (≥1024px) */}
+        <source
+          src="/videos/hero-desktop.mp4"
+          type="video/mp4"
+          media="(min-width:1024px)"
+        />
+        {/* Tablet (≥640px and <1024px) */}
+        <source
+          src="/videos/hero-tablet.mp4"
+          type="video/mp4"
+          media="(min-width:640px)"
+        />
+        {/* Mobile (<640px) */}
+        <source
+          src="/videos/hero-mobile.mp4"
+          type="video/mp4"
+        />
+
+        {/* Fallback image if video fails */}
+        <img
+          src="/images/hero-fallback.jpg"
+          alt="Background"
+          className="w-full h-full object-cover"
+        />
       </video>
 
       {/* ✅ Dark Overlay */}
@@ -43,7 +65,8 @@ const HeroSection: React.FC = () => {
             Integrated High Tech Solutions for Modern Businesses
           </h1>
           <p className="text-xl md:text-2xl text-secondary-100 mb-8 leading-relaxed">
-            We provide comprehensive HR, recruitment, manpower, and verification services to help your business succeed.
+            We provide comprehensive HR, recruitment, manpower, and verification
+            services to help your business succeed.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
