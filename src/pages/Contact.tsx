@@ -70,10 +70,10 @@ const ContactPage = () => {
                   <div>
                     <p className="font-medium text-gray-800">Address</p>
                     <p className="text-gray-600 text-lg">
-                      32, DDA Market,Defence enclave,Preet Vihar, New Delhi, 110092, India
+                      R-307, Third Floor, Dua Complex,24 vs Block , Above Raeev watch & co, Vikas marg , Near Nirman vihar metro station , Delhi -92. 
                     </p>
                     <Link 
-                      to="https://maps.google.com" 
+                      to="https://www.google.com/search?q=Dua+Complex%2C+Vikas+Marg%2C+near+Metro+Pillar+Number+59%2C+Veer+Savarkar+Block%2C+Dayanand+Colony%2C+Shakarpur%2C+New+Delhi%2C+Delhi%2C+110092&sca_esv=39b9ebc457fec9be&sxsrf=AE3TifOnxIUdUYsG_qF5oxAmJ5-NJxRc6A%3A1758270923042&ei=yxXNaJOtAqi4seMP173ikAM&ved=0ahUKEwjTvqXOteSPAxUoXGwGHdeeGDIQ4dUDCBA&uact=5&oq=Dua+Complex%2C+Vikas+Marg%2C+near+Metro+Pillar+Number+59%2C+Veer+Savarkar+Block%2C+Dayanand+Colony%2C+Shakarpur%2C+New+Delhi%2C+Delhi%2C+110092&gs_lp=Egxnd3Mtd2l6LXNlcnAif0R1YSBDb21wbGV4LCBWaWthcyBNYXJnLCBuZWFyIE1ldHJvIFBpbGxhciBOdW1iZXIgNTksIFZlZXIgU2F2YXJrYXIgQmxvY2ssIERheWFuYW5kIENvbG9ueSwgU2hha2FycHVyLCBOZXcgRGVsaGksIERlbGhpLCAxMTAwOTIyDRAuGNEDGMcBGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAuGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gJIyR9QmgVY6RtwAXgAkAEAmAEAoAEAqgEAuAEDyAEA-AEB-AECmAIBoAIMqAIKmAMM8QUEatfqIKiE-pIHATGgBwCyBwC4BwDCBwMzLTHIBwg&sclient=gws-wiz-serp&lqi=Cn9EdWEgQ29tcGxleCwgVmlrYXMgTWFyZywgbmVhciBNZXRybyBQaWxsYXIgTnVtYmVyIDU5LCBWZWVyIFNhdmFya2FyIEJsb2NrLCBEYXlhbmFuZCBDb2xvbnksIFNoYWthcnB1ciwgTmV3IERlbGhpLCBEZWxoaSwgMTEwMDkySMznnNCaqoCACFqlARAAEAEQAhADGAAYARgCGAMYBRgGGAcYCBgJGAoYCxgMGA0YDhgPGBAYERgSIndkdWEgY29tcGxleCB2aWthcyBtYXJnIG5lYXIgbWV0cm8gcGlsbGFyIG51bWJlciA1OSB2ZWVyIHNhdmFya2FyIGJsb2NrIGRheWFuYW5kIGNvbG9ueSBzaGFrYXJwdXIgbmV3IGRlbGhpIGRlbGhpIDExMDA5MpIBC3dhdGNoX3N0b3JlqgG8ARABKhoiFmR1YSBjb21wbGV4IHZpa2FzIG1hcmcoADIfEAEiG9fkoAx_PNT25QViokHVIsaHk-FF6R-sVl6DLTJ7EAIid2R1YSBjb21wbGV4IHZpa2FzIG1hcmcgbmVhciBtZXRybyBwaWxsYXIgbnVtYmVyIDU5IHZlZXIgc2F2YXJrYXIgYmxvY2sgZGF5YW5hbmQgY29sb255IHNoYWthcnB1ciBuZXcgZGVsaGkgZGVsaGkgMTEwMDky#rlimm=7170322026732738597" 
                       target="_blank"
                       className="text-primary-600 hover:text-primary-700 text-sm font-medium mt-1 inline-block"
                     >
@@ -90,7 +90,7 @@ const ContactPage = () => {
                     <p className="font-medium text-gray-800">Office Hours</p>
                     <p className="text-gray-600 text-lg">
                       Monday - Friday: 9:00 AM - 6:00 PM<br />
-                      Saturday - Sunday: Closed
+                      Sunday: Closed
                     </p>
                   </div>
                 </li>

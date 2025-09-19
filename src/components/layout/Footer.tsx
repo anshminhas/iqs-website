@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Linkedin, Facebook, Twitter } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Facebook, Twitter, Instagram } from 'lucide-react';
 import Logo from '../ui/Logo.tsx';
 
 const Footer: React.FC = () => {
@@ -16,7 +16,7 @@ const Footer: React.FC = () => {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/107093167/admin/dashboard/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-secondary-300 transition-colors"
@@ -25,11 +25,11 @@ const Footer: React.FC = () => {
                 <Linkedin size={20} />
               </a>
               <a
-                href="https://facebook.com"
+                href="https://www.instagram.com/iqsindia8/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-secondary-300 transition-colors"
-                aria-label="Facebook"
+                aria-label="Instagram"
               >
                 <Facebook size={20} />
               </a>
@@ -106,7 +106,7 @@ const Footer: React.FC = () => {
               <li className="flex">
                 <MapPin className="mr-3 h-5 w-5 text-secondary-300 flex-shrink-0" />
                 <span className="text-secondary-100">
-                  32 ,DDA Market,Defence enclave,Preet Vihar, Delhi<br />New Delhi, 110092
+                 R-307, Third Floor, Dua Complex,24 vs Block , Above Raeev watch & co, Vikas marg , Near Nirman vihar metro station.<br />New Delhi, 110092
                 </span>
               </li>
               <li className="flex">
@@ -128,7 +128,7 @@ const Footer: React.FC = () => {
         <hr className="border-primary-500 my-8" />
 
         <div className="flex flex-col md:flex-row justify-between items-center text-secondary-200 text-sm">
-          <p>© {new Date().getFullYear()} IQS - Integrated Quality Solutions. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} IQS - Integrated Quality Solutions. All rights reserved @2025.</p>
           <div className="flex mt-4 md:mt-0 space-x-6">
             
           </div>
