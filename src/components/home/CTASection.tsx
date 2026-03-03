@@ -55,7 +55,7 @@ const CTASection: React.FC = () => {
             Get Started Today
           </Button>
           <Button
-            href="/demo"
+            href="/contact"
             variant="outline"
             size="lg"
             className="bg-transparent border-white text-white hover:bg-white/10 font-semibold"
