@@ -58,7 +58,7 @@ const PricingSection: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
         <SectionHeader
           title="Simple, Transparent Pricing"
-          subtitle="Choose a plan that works best for your business needs. All plans include core features with varying levels of service."
+          subtitle ="Choose a plan that works best for your business needs. All plans include core features with varying levels of service."
           centered
         />
         

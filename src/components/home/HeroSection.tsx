@@ -65,7 +65,7 @@ const HeroSection: React.FC = () => {
             Integrated High Tech Solutions for Modern Businesses
           </h1>
           <p className="text-xl md:text-2xl text-secondary-100 mb-8 leading-relaxed">
-            We provide comprehensive HR, recruitment, manpower, and verification
+            We provide comprehensive HR, recruitment, manpower, and payroll
             services to help your business succeed.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">

@@ -12,12 +12,10 @@ const NoticeBanner: React.FC = () => {
                 <div className="flex-1 overflow-hidden relative">
                     <div className="flex animate-marquee whitespace-nowrap">
                         <span className="text-[11.5px] font-medium inline-flex items-center gap-2 px-6">
-                            <AlertTriangle className="w-3 h-3 flex-shrink-0 opacity-80" />
                             {noticeText}
                         </span>
                         {/* Duplicate for seamless loop */}
                         <span className="text-[11.5px] font-medium inline-flex items-center gap-2 px-6">
-                            <AlertTriangle className="w-3 h-3 flex-shrink-0 opacity-80" />
                             {noticeText}
                         </span>
                     </div>

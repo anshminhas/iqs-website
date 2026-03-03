@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Clock, ExternalLink, MessageCircle } from 'lucide-react';
 import ContactForm from '../components/ui/ContactForm';
 
@@ -29,15 +29,58 @@ const contactInfo = [
   },
 ];
 
+/* ── Floating keyboard keys ── */
+const KEYS = ['H', 'R', 'IQS', '?', '@', '✓', 'Hi!', '📞', '✉', 'Q', 'S'];
+
+/* ── Typewriter hook ── */
+function useTypewriter(phrases: string[], speed = 80, pause = 1800) {
+  const [display, setDisplay] = useState('');
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = phrases[phraseIdx];
+    let timer: ReturnType<typeof setTimeout>;
+
+    if (!deleting && charIdx < current.length) {
+      timer = setTimeout(() => setCharIdx(c => c + 1), speed);
+    } else if (!deleting && charIdx === current.length) {
+      timer = setTimeout(() => setDeleting(true), pause);
+    } else if (deleting && charIdx > 0) {
+      timer = setTimeout(() => setCharIdx(c => c - 1), speed / 2);
+    } else {
+      setDeleting(false);
+      setPhraseIdx(p => (p + 1) % phrases.length);
+    }
+
+    setDisplay(current.slice(0, charIdx));
+    return () => clearTimeout(timer);
+  }, [charIdx, deleting, phraseIdx, phrases, speed, pause]);
+
+  return display;
+}
+
 const ContactPage = () => {
   React.useEffect(() => {
     document.title = 'Contact Us | IQS - Integrated Quality Solutions';
   }, []);
 
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { setTimeout(() => setVisible(true), 100); }, []);
+
+  const typed = useTypewriter([
+    'Get in Touch.',
+    "We're Here to Help You.",
+    "Your Growth Partner.",
+    'Start a Conversation.',
+    'Reach Out to Us.',
+  ]);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
 
-      {/* Hero Banner */}
+      {/* ── Hero Banner ── */}
       <div
         className="relative overflow-hidden"
         style={{
@@ -46,25 +89,65 @@ const ContactPage = () => {
           backgroundPosition: 'center',
         }}
       >
-        {/* Dark overlay */}
+        {/* Overlay */}
         <div className="absolute inset-0 bg-primary-700 opacity-90 z-0" />
 
-        {/* Decorative blobs */}
-        <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full" />
-        <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-white/5 rounded-full" />
+        {/* Floating keyboard keys */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {KEYS.map((key, i) => (
+            <div
+              key={i}
+              className="absolute flex items-center justify-center bg-white/8 border border-white/15 rounded-lg text-white/25 font-mono font-bold text-sm backdrop-blur-sm select-none"
+              style={{
+                width: key.length > 2 ? '52px' : '38px',
+                height: '38px',
+                left: `${(i * 9 + 3) % 95}%`,
+                top: `${(i * 17 + 10) % 85}%`,
+                animation: `floatKey ${3.5 + (i % 3) * 0.8}s ease-in-out infinite`,
+                animationDelay: `${i * 0.3}s`,
+                fontSize: key.length > 2 ? '10px' : '14px',
+              }}
+            >
+              {key}
+            </div>
+          ))}
+        </div>
 
-        <div className="container mx-auto px-4 md:px-6 py-16 md:py-20 relative z-10">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-medium px-4 py-2 rounded-full mb-5">
+        {/* Hero content */}
+        <div className="container mx-auto px-4 md:px-6 py-16 md:py-24 relative z-10">
+          {/* Badge */}
+          <div
+            className={`inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-medium px-4 py-2 rounded-full mb-6 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
+          >
             <MessageCircle className="w-4 h-4" />
             We're here to help
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold font-montserrat text-white mb-4">
-            Get in Touch
+
+          {/* Typewriter heading */}
+          <h1
+            className={`text-4xl md:text-5xl lg:text-6xl font-bold font-montserrat text-white mb-4 leading-tight min-h-[1.2em] transition-all duration-700 delay-100 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+          >
+            {typed}
+            {/* Blinking cursor */}
+            <span className="inline-block w-0.5 h-[0.85em] bg-white ml-1 align-middle animate-pulse" />
           </h1>
-          <p className="text-xl text-white/80 max-w-xl leading-relaxed">
-            Have questions or ready to transform your HR operations? Our experts are just a message away.
+
+          {/* Subtitle */}
+          <p
+            className={`text-lg md:text-xl text-white/75 max-w-xl leading-relaxed transition-all duration-700 delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+          >
+            Have questions or ready to transform your HR operations?<br />
+            Our experts are just a message away.
           </p>
         </div>
+
+        {/* Keyframe styles */}
+        <style>{`
+          @keyframes floatKey {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+          }
+        `}</style>
       </div>
 
       {/* Main Content */}

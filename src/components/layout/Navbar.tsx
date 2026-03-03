@@ -83,20 +83,31 @@ const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-8 left-0 right-0 z-50 transition-all duration-300 ${scrolled || isOpen
+      className={`fixed top-8 left-0 right-0 z-50 transition-colors duration-400 ${scrolled || isOpen
         ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg'
         : 'bg-white dark:bg-gray-900 shadow-md'
         }`}
+      style={{ transition: 'background-color 300ms ease, box-shadow 300ms ease' }}
     >
       <div className="container mx-auto px-4 md:px-6">
-        <nav className="flex items-center justify-between h-20.5">
+        <nav
+          className="flex items-center justify-between"
+          style={{
+            height: scrolled ? '56px' : '82px',
+            transition: 'height 350ms cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+        >
           {/* Logo */}
           <Link to="/" className="z-50 flex items-center">
             <img
               src={theme === 'dark' ? logoDark : logoLight}
               alt="IQS Logo"
-              className={`object-contain transition-all duration-300 hover:scale-105  ${theme === 'dark' ? 'h-21 w-40 ' : 'h-21 w-40'
-                }`}
+              style={{
+                objectFit: 'contain',
+                height: scrolled ? (theme === 'dark' ? '48px' : '44px') : '84px',
+                width: scrolled ? '128px' : '160px',
+                transition: 'height 350ms cubic-bezier(0.4, 0, 0.2, 1), width 350ms cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
             />
           </Link>
 

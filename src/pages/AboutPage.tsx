@@ -8,15 +8,15 @@ const AboutPage: React.FC = () => {
     <div className="bg-white">
       {/* Hero Section */}
       <section className="relative pt-20 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center z-0" 
-          style={{ 
-            backgroundImage: 'url(https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)', 
+        <div
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{
+            backgroundImage: 'url(https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)',
           }}
         >
           <div className="absolute inset-0 bg-primary-600 opacity-80"></div>
         </div>
-        
+
         <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24 lg:py-32">
           <div className="max-w-3xl animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-montserrat text-white mb-6 leading-tight">
@@ -34,30 +34,27 @@ const AboutPage: React.FC = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold font-montserrat text-gray-900 mb-8">
-               IQS – INTIGRATED QUALITY SOLUTIONS
+              IQS – INTIGRATED QUALITY SOLUTIONS
             </h2>
             <p className="text-lg text-gray-600 mb-6">
-             IQS – Integrated Quality Solutions is your trusted partner in HR outsourcing, talent acquisition, manpower deployment, and risk control verification services. Established with a clear mission to streamline and enhance workforce solutions, we combine technology-driven systems with a people-first mindset to empower growing businesses, enterprises, financial institutions, and service providers across India.
+            IQS – Integrated Quality Solutions is a professionally managed HR and workforce solutions firm delivering structured, compliant, and scalable business support services across India. Built on the principles of integrity, precision, and operational excellence, IQS partners with organizations to streamline workforce management and enhance operational efficiency.
             </p>
             <p className="text-lg text-gray-600 mb-6">
-             At IQS, we understand that managing people, processes, and compliance efficiently is not just a necessity—it’s a strategic advantage. That’s why we offer a full spectrum of services including end-to-end HR lifecycle management, manpower supply, recruitment process outsourcing (RPO), employee background screening, and RCU (Risk Containment Unit) verifications for banks, NBFCs, insurance companies, and corporates.</p>
-            
+              Our core expertise spans HR services, end-to-end payroll management, manpower supply, recruitment solutions, and project outsourcing (IT and Non-IT). For payroll operations, we utilize premium, technology-driven payroll software integrated with expert oversight from experienced payroll professionals. This ensures accurate salary processing, statutory compliance (PF, ESI, TDS), attendance validation, reporting, and regulatory adherence with complete confidentiality and zero-error execution.</p>
+
             <p className="text-lg text-gray-600 mb-6">
-             What sets us apart is our uncompromising focus on quality, accountability, and confidentiality. Backed by a dedicated team of HR professionals, field investigators, recruitment specialists, and compliance experts, IQS brings you customized, scalable, and cost-effective solutions aligned with your operational needs and industry regulations.
+            Beyond payroll and HR, IQS provides dependable project outsourcing solutions handled exclusively by qualified, industry-experienced teams. Whether managing specialized assignments or executing full-scale operational projects, our expert professionals ensure structured delivery, performance accountability, and measurable outcomes aligned with client objectives.
             </p>
-            
+
             <p className="text-lg text-gray-600 mb-6">
-             We take pride in our ability to seamlessly integrate with client systems, ensuring minimal disruption and maximum value. From onboarding support, payroll, and employee documentation to identity verifications, financial background checks, and claim validations—we ensure every step is handled with precision and professionalism.</p>
-            
+             At IQS, we believe workforce and operational management are strategic enablers of business growth—not merely administrative functions. Our services are supported by disciplined processes, strong compliance frameworks, and seamless system integration to deliver efficiency, transparency, and long-term value.</p>
+
+<p className="text-lg text-gray-600 mb-6">
+            We proudly support startups, SMEs, enterprises, and service-driven organizations seeking reliable outsourcing partnerships backed by expertise, technology, and professionalism.</p>
+
             <p className="text-lg text-gray-600 mb-6">
-             Whether you're a startup building a lean team, a corporate streamlining HR costs, or a financial institution looking for robust risk control mechanisms, IQS is equipped to deliver faster turnaround times, ISO-aligned processes, and exceptional service quality across all touchpoints.</p>
-            
-            <p className="text-lg text-gray-600 mb-6">
-             Whether you're a startup building a lean team, a corporate streamlining HR costs, or a financial institution looking for robust risk control mechanisms, IQS is equipped to deliver faster turnaround times, ISO-aligned processes, and exceptional service quality across all touchpoints.</p>
-            
-            <p className="text-lg text-gray-600">
-             Partner with IQS and let us handle the complexities of HR and verification—so you can focus on growing your business with confidence.</p>
-        </div>
+              Partner with IQS to transform your HR and payroll operations into a structured, compliant, and growth-driven advantage.</p>
+          </div>
         </div>
       </section>
 
@@ -70,7 +67,7 @@ const AboutPage: React.FC = () => {
             At IQS, we don't just provide services — we build partnerships that drive performance."
             centered
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
             {[
               {
@@ -104,7 +101,7 @@ const AboutPage: React.FC = () => {
                 description: "Dedicated to our clients' long-term success"
               },
               {
-                icon:  ShieldCheck,
+                icon: ShieldCheck,
                 title: "Data Privacy & Security",
                 description: "Strict adherence to labor laws, data protection, and ISO standards"
               },
