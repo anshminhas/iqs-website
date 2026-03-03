@@ -165,7 +165,7 @@ const AboutPage: React.FC = () => {
               Get Started
             </Button>
             <Button
-              href="/services"
+              href="/services/payroll"
               variant="outline"
               size="lg"
               className="bg-transparent border-white text-white hover:bg-white/10 font-semibold"

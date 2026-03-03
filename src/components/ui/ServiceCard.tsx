@@ -18,13 +18,13 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   return (
     <Card hoverable className={`h-full ${className}`}>
       <div className="p-6 flex flex-col items-center text-center">
-        <div className="w-14 h-14 bg-primary-50 rounded-full flex items-center justify-center mb-5">
-          <Icon className="h-7 w-7 text-primary-600" />
+        <div className="w-14 h-14 bg-primary-50 dark:bg-primary-900/30 rounded-full flex items-center justify-center mb-5">
+          <Icon className="h-7 w-7 text-primary-600 dark:text-blue-400" />
         </div>
-        <h3 className="text-xl font-semibold font-montserrat text-gray-800 mb-3">
+        <h3 className="text-xl font-semibold font-montserrat text-gray-800 dark:text-white mb-3">
           {title}
         </h3>
-        <p className="text-gray-600">{description}</p>
+        <p className="text-gray-600 dark:text-gray-300">{description}</p>
       </div>
     </Card>
   );

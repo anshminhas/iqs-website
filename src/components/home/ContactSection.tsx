@@ -1,97 +1,78 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, ExternalLink } from 'lucide-react';
 import SectionHeader from '../ui/SectionHeader';
 import ContactForm from '../ui/ContactForm';
-import { Link } from 'react-router-dom';
+
+const MAPS_URL =
+  'https://www.google.com/maps/place/IQS-Integrated+Quality+Solutions+consultants+%26+Outsourcing+Services./@28.6353344,77.2851613,20.11z/data=!4m6!3m5!1s0x390cfd688764dc67:0xa00f900a4ac92f6!8m2!3d28.6353613!4d77.2852049!16s%2Fg%2F11xztgj_k9?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D';
 
 const ContactSection: React.FC = () => {
   return (
-    <section id="contact" className="py-16 md:py-24 bg-white">
+    <section id="contact" className="py-16 md:py-24 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4 md:px-6">
         <SectionHeader
           title="Contact Us"
-          subtitle="Have questions or ready to get started? Reach out to our team."
+          subtitle="Have questions or ready to get started? Reach out to our team — we'd love to hear from you."
           centered
         />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Contact Information */}
-          <div className="lg:col-span-1 space-y-8 bg-gray-50 p-8 rounded-xl shadow-sm">
-            <div>
-              <h3 className="text-2xl font-bold font-montserrat text-gray-900 mb-6">
-                Get in Touch
-              </h3>
-              <p className="text-gray-600 mb-8 text-lg">
-                Fill out the form or contact us directly using the information below.
-              </p>
-              
-              <ul className="space-y-6">
-                <li className="flex items-start">
-                  <div className="bg-primary-100 p-3 rounded-full mr-4">
-                    <Phone className="h-5 w-5 text-primary-600" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          {/* Left: Contact Info */}
+          <div className="lg:col-span-1 space-y-5">
+            {/* Info cards */}
+            {[
+              { icon: Phone, label: 'Phone', value: '+(91) 7042559158', href: 'tel:+917042559158', color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' },
+              { icon: Mail, label: 'Email', value: 'info@iqsindia.in', href: 'mailto:info@iqsindia.in', color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' },
+              { icon: Clock, label: 'Hours', value: 'Mon–Sat: 9AM – 6PM', href: null, color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div key={i} className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 flex items-center gap-4">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                    <Icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-800">Phone</p>
-                    <a 
-                      href="tel:+917042559158" 
-                      className="text-gray-600 hover:text-primary-600 transition-colors text-lg"
-                    >
-                      +(91) 7042559158
-                    </a>
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">{item.label}</p>
+                    {item.href
+                      ? <a href={item.href} className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-blue-400 transition-colors">{item.value}</a>
+                      : <p className="text-sm font-medium text-gray-900 dark:text-white">{item.value}</p>
+                    }
                   </div>
-                </li>
-                
-                <li className="flex items-start">
-                  <div className="bg-primary-100 p-3 rounded-full mr-4">
-                    <Mail className="h-5 w-5 text-primary-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-800">Email</p>
-                    <a 
-                      href="mailto:info@iqsolutions.com" 
-                      className="text-gray-600 hover:text-primary-600 transition-colors text-lg"
-                    >
-                      info@iqsindia.in
-                    </a>
-                  </div>
-                </li>
-                
-                <li className="flex items-start">
-                  <div className="bg-primary-100 p-3 rounded-full mr-4">
-                    <MapPin className="h-5 w-5 text-primary-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-800">Address</p>
-                    <p className="text-gray-600 text-lg">
-                      R-307, Third Floor, Dua Complex,24 vs Block , Above Raeev watch & co, Vikas marg , Near Nirman vihar metro station , Delhi -92. 
-                    </p>
-                    <Link 
-                      to="https://www.google.com/search?q=Dua+Complex%2C+Vikas+Marg%2C+near+Metro+Pillar+Number+59%2C+Veer+Savarkar+Block%2C+Dayanand+Colony%2C+Shakarpur%2C+New+Delhi%2C+Delhi%2C+110092&sca_esv=39b9ebc457fec9be&sxsrf=AE3TifOnxIUdUYsG_qF5oxAmJ5-NJxRc6A%3A1758270923042&ei=yxXNaJOtAqi4seMP173ikAM&ved=0ahUKEwjTvqXOteSPAxUoXGwGHdeeGDIQ4dUDCBA&uact=5&oq=Dua+Complex%2C+Vikas+Marg%2C+near+Metro+Pillar+Number+59%2C+Veer+Savarkar+Block%2C+Dayanand+Colony%2C+Shakarpur%2C+New+Delhi%2C+Delhi%2C+110092&gs_lp=Egxnd3Mtd2l6LXNlcnAif0R1YSBDb21wbGV4LCBWaWthcyBNYXJnLCBuZWFyIE1ldHJvIFBpbGxhciBOdW1iZXIgNTksIFZlZXIgU2F2YXJrYXIgQmxvY2ssIERheWFuYW5kIENvbG9ueSwgU2hha2FycHVyLCBOZXcgRGVsaGksIERlbGhpLCAxMTAwOTIyDRAuGNEDGMcBGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAuGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gIyBxAjGCcY6gJIyR9QmgVY6RtwAXgAkAEAmAEAoAEAqgEAuAEDyAEA-AEB-AECmAIBoAIMqAIKmAMM8QUEatfqIKiE-pIHATGgBwCyBwC4BwDCBwMzLTHIBwg&sclient=gws-wiz-serp&lqi=Cn9EdWEgQ29tcGxleCwgVmlrYXMgTWFyZywgbmVhciBNZXRybyBQaWxsYXIgTnVtYmVyIDU5LCBWZWVyIFNhdmFya2FyIEJsb2NrLCBEYXlhbmFuZCBDb2xvbnksIFNoYWthcnB1ciwgTmV3IERlbGhpLCBEZWxoaSwgMTEwMDkySMznnNCaqoCACFqlARAAEAEQAhADGAAYARgCGAMYBRgGGAcYCBgJGAoYCxgMGA0YDhgPGBAYERgSIndkdWEgY29tcGxleCB2aWthcyBtYXJnIG5lYXIgbWV0cm8gcGlsbGFyIG51bWJlciA1OSB2ZWVyIHNhdmFya2FyIGJsb2NrIGRheWFuYW5kIGNvbG9ueSBzaGFrYXJwdXIgbmV3IGRlbGhpIGRlbGhpIDExMDA5MpIBC3dhdGNoX3N0b3JlqgG8ARABKhoiFmR1YSBjb21wbGV4IHZpa2FzIG1hcmcoADIfEAEiG9fkoAx_PNT25QViokHVIsaHk-FF6R-sVl6DLTJ7EAIid2R1YSBjb21wbGV4IHZpa2FzIG1hcmcgbmVhciBtZXRybyBwaWxsYXIgbnVtYmVyIDU5IHZlZXIgc2F2YXJrYXIgYmxvY2sgZGF5YW5hbmQgY29sb255IHNoYWthcnB1ciBuZXcgZGVsaGkgZGVsaGkgMTEwMDky#rlimm=7170322026732738597"
-                      className="text-primary-600 hover:text-primary-700 text-sm font-medium mt-1 inline-block"
-                    >
-                      View on Map →
-                    </Link>
-                  </div>
-                </li>
-                
-                <li className="flex items-start">
-                  <div className="bg-primary-100 p-3 rounded-full mr-4">
-                    <Clock className="h-5 w-5 text-primary-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-800">Office Hours</p>
-                    <p className="text-gray-600 text-lg">
-                      Monday - Saturday: 9:00 AM - 6:00 PM<br />
-                       Sunday: Closed
-                    </p>
-                  </div>
-                </li>
-              </ul>
+                </div>
+              );
+            })}
+
+            {/* Address + Maps CTA */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Address</p>
+                  <p className="text-sm text-gray-900 dark:text-white leading-relaxed">
+                    R-307, Dua Complex, Vikas Marg,<br />
+                    Near Nirman Vihar Metro Station,<br />
+                    New Delhi – 110092
+                  </p>
+                </div>
+              </div>
+              <a
+                href={MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-xl transition-colors"
+              >
+                <MapPin className="w-4 h-4" />
+                View in Google Maps
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
             </div>
           </div>
-          
-          {/* Contact Form */}
-          <div className="lg:col-span-2 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+
+          {/* Right: Form */}
+          <div className="lg:col-span-2 bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-gray-700">
+            <h3 className="text-xl font-bold font-montserrat text-gray-900 dark:text-white mb-6">Send Us a Message</h3>
             <ContactForm />
           </div>
         </div>
