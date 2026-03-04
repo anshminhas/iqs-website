@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Linkedin, Instagram, Twitter } from 'lucide-react';
-import Logo from '../ui/Logo.tsx';
+import Logo from '../../assets/d.png';
 
 const Footer: React.FC = () => {
   return (
@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-6">
-            <Logo className="h-12 mb-4" />
+            <img src={Logo} alt="Company Logo" className="h-12 w-auto"/>
             <p className="text-secondary-100 dark:text-gray-300 max-w-xs text-sm leading-relaxed">
               Providing top-tier HR, recruitment, and payroll services to businesses. Enhancing their operations by innovative and high-tech techniques.
             </p>
