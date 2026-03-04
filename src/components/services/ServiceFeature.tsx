@@ -1,5 +1,5 @@
 import React from 'react';
-import { DivideIcon as LucideIcon } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 interface ServiceFeatureProps {
   icon: LucideIcon;
@@ -29,18 +29,18 @@ const ServiceFeature: React.FC<ServiceFeatureProps> = ({
         </div>
       ) : (
         <div className="w-full md:w-1/2 flex justify-center">
-          <div className="w-32 h-32 bg-primary-50 rounded-full flex items-center justify-center">
-            <Icon className="h-16 w-16 text-primary-600" />
+          <div className="w-32 h-32 bg-primary-50 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+            <Icon className="h-16 w-16 text-primary-600 dark:text-blue-400" />
           </div>
         </div>
       )}
-      
+
       {/* Content */}
       <div className="w-full md:w-1/2 space-y-4">
-        <h3 className="text-2xl font-semibold font-montserrat text-gray-800">
+        <h3 className="text-2xl font-semibold font-montserrat text-gray-800 dark:text-white">
           {title}
         </h3>
-        <p className="text-gray-600 leading-relaxed">
+        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
           {description}
         </p>
       </div>

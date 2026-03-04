@@ -82,15 +82,15 @@ const RecruitmentManpower: React.FC = () => {
       {/* Hero Section */}
       <section className="relative pt-20 overflow-hidden">
         {/* Background with overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center z-0" 
-          style={{ 
-            backgroundImage: 'url(https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)', 
+        <div
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{
+            backgroundImage: 'url(https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)',
           }}
         >
           <div className="absolute inset-0 bg-primary-600 opacity-80"></div>
         </div>
-        
+
         <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24">
           <div className="max-w-3xl animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold font-montserrat text-white mb-6 leading-tight">
@@ -104,14 +104,14 @@ const RecruitmentManpower: React.FC = () => {
       </section>
 
       {/* Services Grid */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-4 md:px-6">
           <SectionHeader
             title="Our Recruitment & Manpower Services"
             subtitle="We provide comprehensive talent acquisition and workforce management solutions to help you build high-performing teams."
             centered
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
             {services.map((service, index) => (
               <ServiceCard
@@ -126,14 +126,14 @@ const RecruitmentManpower: React.FC = () => {
       </section>
 
       {/* Recruitment Process Flow */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
         <div className="container mx-auto px-4 md:px-6">
           <SectionHeader
             title="Our Recruitment Process"
             subtitle="Our systematic approach ensures we identify, evaluate, and deliver the right talent for your organization."
             centered
           />
-          
+
           <div className="mt-12 max-w-4xl mx-auto">
             <ProcessFlow steps={recruitmentSteps} />
           </div>
@@ -141,31 +141,31 @@ const RecruitmentManpower: React.FC = () => {
       </section>
 
       {/* Industries Served */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-4 md:px-6">
           <SectionHeader
             title="Industries We Serve"
             subtitle="We have experience recruiting across diverse industries, delivering specialized talent that understands your sector's unique challenges."
             centered
           />
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-12">
             {[
-              "Information Technology", 
-              "Healthcare & Pharmaceuticals", 
-              "Banking & Finance", 
+              "Information Technology",
+              "Healthcare & Pharmaceuticals",
+              "Banking & Finance",
               "Manufacturing",
-              "Retail & E-commerce", 
-              "Telecommunications", 
-              "Construction & Engineering", 
+              "Retail & E-commerce",
+              "Telecommunications",
+              "Construction & Engineering",
               "Energy & Utilities",
               "Hospitality & Tourism",
               "Education",
               "Logistics & Supply Chain",
               "Media & Entertainment"
             ].map((industry, index) => (
-              <div key={index} className="bg-gray-50 p-4 rounded-lg text-center shadow-sm hover:shadow-elevation-1 transition-shadow">
-                <p className="font-medium text-gray-800">{industry}</p>
+              <div key={index} className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg text-center shadow-sm hover:shadow-elevation-1 transition-all duration-300">
+                <p className="font-medium text-gray-800 dark:text-gray-200">{industry}</p>
               </div>
             ))}
           </div>
@@ -173,22 +173,22 @@ const RecruitmentManpower: React.FC = () => {
       </section>
 
       {/* Testimonials Section - Testimonials specific to recruitment */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
         <div className="container mx-auto px-4 md:px-6">
           <SectionHeader
             title="Recruitment Success Stories"
             subtitle="See how our recruitment solutions have helped organizations find exceptional talent."
             centered
           />
-          
-          <div className="bg-white p-8 rounded-lg shadow-elevation-1 mt-12">
-            <blockquote className="text-lg italic text-gray-700 mb-6">
+
+          <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-elevation-1 mt-12 transition-colors duration-300">
+            <blockquote className="text-lg italic text-gray-700 dark:text-gray-300 mb-6 font-medium">
               "IQS helped us scale our engineering team during a critical growth phase. Their thorough understanding of our technical requirements and company culture resulted in high-quality candidates who integrated seamlessly. The entire process was handled professionally, and we continue to rely on their expertise for our hiring needs."
             </blockquote>
             <div className="flex items-center">
               <div>
-                <p className="font-semibold text-gray-900">Robert Torres</p>
-                <p className="text-sm text-gray-600">CTO, Innovate Technologies</p>
+                <p className="font-semibold text-gray-900 dark:text-white">Robert Torres</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">CTO, Innovate Technologies</p>
               </div>
             </div>
           </div>
@@ -204,11 +204,11 @@ const RecruitmentManpower: React.FC = () => {
           <p className="text-lg text-secondary-100 max-w-3xl mx-auto mb-8">
             We stand behind our recruitment services with a comprehensive replacement guarantee. If a placed candidate leaves or doesn't meet expectations within the guarantee period, we'll find a suitable replacement at no additional cost.
           </p>
-          <a 
-            href="/contact" 
+          <a
+            href="/contact"
             className="inline-block px-6 py-3 bg-white text-primary-600 font-semibold rounded-md hover:bg-secondary-100 transition-colors"
           >
-            Learn More 
+            Learn More
           </a>
         </div>
       </section>

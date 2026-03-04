@@ -49,15 +49,15 @@ const HrServices: React.FC = () => {
       {/* Hero Section */}
       <section className="relative pt-20 overflow-hidden">
         {/* Background with overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center z-0" 
-          style={{ 
-            backgroundImage: 'url(https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)', 
+        <div
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{
+            backgroundImage: 'url(https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)',
           }}
         >
           <div className="absolute inset-0 bg-primary-600 opacity-80"></div>
         </div>
-        
+
         <div className="container mx-auto px-4 md:px-6 relative z-10 py-16 md:py-24">
           <div className="max-w-3xl animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold font-montserrat text-white mb-6 leading-tight">
@@ -71,14 +71,14 @@ const HrServices: React.FC = () => {
       </section>
 
       {/* Services Grid */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-4 md:px-6">
           <SectionHeader
             title="Our HR Service Offerings"
             subtitle="We provide comprehensive HR solutions tailored to your business needs, regardless of your company size or industry."
             centered
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
             {services.map((service, index) => (
               <ServiceCard
@@ -93,13 +93,13 @@ const HrServices: React.FC = () => {
       </section>
 
       {/* Featured Services */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
         <div className="container mx-auto px-4 md:px-6">
           <SectionHeader
             title="Featured HR Services"
             subtitle="Explore our premium HR offerings designed to streamline your operations and enhance employee satisfaction."
           />
-          
+
           <div className="space-y-20 mt-12">
             <ServiceFeature
               icon={FileText}
@@ -107,7 +107,7 @@ const HrServices: React.FC = () => {
               description="Our payroll services handle everything from basic processing to complex tax compliance. We ensure accurate and timely payments, tax calculations, and reporting, freeing your team to focus on strategic initiatives. Our system adapts to your specific needs, whether you're a small business or a large enterprise with international operations."
               imageSrc="https://eminencetechnosystem.com/images/payroll.jpg"
             />
-            
+
             <ServiceFeature
               icon={Shield}
               title="HR Compliance & Risk Management"
@@ -115,7 +115,7 @@ const HrServices: React.FC = () => {
               isReversed
               imageSrc="https://images.pexels.com/photos/6615076/pexels-photo-6615076.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
             />
-            
+
             <ServiceFeature
               icon={Clock}
               title="Advanced Attendance Management"
@@ -127,47 +127,47 @@ const HrServices: React.FC = () => {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-16 md:py-24 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-4 md:px-6">
           <SectionHeader
             title="Why Choose Our HR Services"
             subtitle="Our approach to HR services ensures you receive tailored, effective solutions that address your specific business challenges."
             centered
           />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-            <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-primary-600">
-              <h3 className="text-xl font-semibold font-montserrat text-gray-800 mb-3">
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border-l-4 border-primary-600 transition-colors duration-300">
+              <h3 className="text-xl font-semibold font-montserrat text-gray-800 dark:text-white mb-3">
                 Expertise & Experience
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Our team of HR professionals brings decades of combined experience across various industries, ensuring you receive knowledgeable guidance and support.
               </p>
             </div>
-            
-            <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-primary-600">
-              <h3 className="text-xl font-semibold font-montserrat text-gray-800 mb-3">
+
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border-l-4 border-primary-600 transition-colors duration-300">
+              <h3 className="text-xl font-semibold font-montserrat text-gray-800 dark:text-white mb-3">
                 Customized Solutions
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 We understand that every business is unique. Our services are tailored to meet your specific needs, whether you're a startup or an established enterprise.
               </p>
             </div>
-            
-            <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-primary-600">
-              <h3 className="text-xl font-semibold font-montserrat text-gray-800 mb-3">
+
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border-l-4 border-primary-600 transition-colors duration-300">
+              <h3 className="text-xl font-semibold font-montserrat text-gray-800 dark:text-white mb-3">
                 Technology-Driven Approach
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 We leverage cutting-edge HR technologies to streamline processes, improve accuracy, and provide valuable insights for better decision-making.
               </p>
             </div>
-            
-            <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-primary-600">
-              <h3 className="text-xl font-semibold font-montserrat text-gray-800 mb-3">
+
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border-l-4 border-primary-600 transition-colors duration-300">
+              <h3 className="text-xl font-semibold font-montserrat text-gray-800 dark:text-white mb-3">
                 Compliance Focus
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Our team stays updated on changing regulations to ensure your HR practices remain compliant with all relevant laws and standards.
               </p>
             </div>

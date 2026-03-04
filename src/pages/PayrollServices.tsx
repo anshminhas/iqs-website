@@ -78,14 +78,14 @@ const whyOutsource = [
     },
     {
         title: 'Employee Experience & Self-Service',
-        subtitle: 'Empower employees. Reduce HR dependency.',
+        subtitle: 'Empower employees. Reduce HR dependency, and make owner stress free.',
         color: 'from-purple-500 to-pink-600',
         points: [
             'Online attendance management',
             'Reimbursement entry & approval workflows',
             'Investment proof upload & verification',
             'Centralised query management system',
-            'Employees get transparency. HR gets peace of mind.',
+            'Employees get transparency. HR gets peace of mind and Owners get stree free operations.',
         ],
     },
     {
