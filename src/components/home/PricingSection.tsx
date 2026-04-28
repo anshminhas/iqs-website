@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import SectionHeader from '../ui/SectionHeader';
 import PricingCard from '../ui/PricingCard';

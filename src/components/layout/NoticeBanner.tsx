@@ -1,5 +1,5 @@
+"use client";
 import React from 'react';
-import { ShieldAlert, AlertTriangle } from 'lucide-react';
 
 const noticeText =
     '⚠️  IMPORTANT: IQS India follows strict ethical recruitment standards. We never charge candidates for job placements, and we do not engage in blind sourcing. Beware of fraudsters falsely claiming to represent IQS or soliciting money for placements — these are scams. Stay vigilant. To verify our identity or report suspicious activity, contact us directly at info@iqsindia.in or +(91) 7042559158. Your trust matters to us.';

@@ -1,5 +1,6 @@
+"use client";
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Mail, Phone, MapPin, Linkedin, Instagram, Twitter } from 'lucide-react';
 import Logo from '../../assets/d.png';
 
@@ -10,7 +11,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-6">
-            <img src={Logo} alt="Company Logo" className="h-12 w-auto"/>
+            <img src={(Logo as any).src || Logo} alt="Company Logo" className="h-12 w-auto"/>
             <p className="text-secondary-100 dark:text-gray-300 max-w-xs text-sm leading-relaxed">
               Providing top-tier HR, recruitment, and payroll services to businesses. Enhancing their operations by innovative and high-tech techniques.
             </p>
@@ -50,22 +51,22 @@ const Footer: React.FC = () => {
             <h3 className="text-base font-montserrat font-semibold mb-5">Services</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/services/hr-services" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/services/hr-services" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
                   HR Services
                 </Link>
               </li>
               <li>
-                <Link to="/services/recruitment-manpower" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/services/recruitment-manpower" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
                   Recruitment &amp; Manpower
                 </Link>
               </li>
               <li>
-                <Link to="/services/payroll" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/services/payroll" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
                   Payroll Services
                 </Link>
               </li>
               <li>
-                <Link to="/services/project-outsourcing" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/services/project-outsourcing" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
                   Project Outsourcing
                 </Link>
               </li>
@@ -77,18 +78,23 @@ const Footer: React.FC = () => {
             <h3 className="text-base font-montserrat font-semibold mb-5">Quick Links</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/about" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
+                <Link href="/contact" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
                   Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/login" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
+                  Login
                 </Link>
               </li>
             </ul>
@@ -117,7 +123,7 @@ const Footer: React.FC = () => {
               <li className="flex gap-3">
                 <Phone className="h-4 w-4 text-secondary-300 flex-shrink-0 mt-0.5" />
                 <a href="tel:+917042559158" className="text-secondary-100 dark:text-gray-300 hover:text-white text-sm transition-colors">
-                  +(91) 7042559158
+                  {"+(91) 7042559158"}
                 </a>
               </li>
               <li className="flex gap-3">

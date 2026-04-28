@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { Mail, Phone, MapPin, Clock, ExternalLink } from 'lucide-react';
 import SectionHeader from '../ui/SectionHeader';

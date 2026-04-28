@@ -1,5 +1,6 @@
+"use client";
 import React, { useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { usePathname, useRouter } from 'next/navigation';
 import { ArrowRight, Phone, Sparkles, TrendingUp, Users, Zap, BarChart3 } from 'lucide-react';
 
 /* Floating animated card data */
@@ -11,26 +12,26 @@ const floatingCards = [
 ];
 
 const CTASection: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname() || '';
+  const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const getServiceName = () => {
-    if (location.pathname.includes('hr-services')) return 'HR Operations';
-    if (location.pathname.includes('recruitment-manpower')) return 'Recruitment & Manpower';
-    if (location.pathname.includes('rcu-verification')) return 'RCU & Verification';
-    if (location.pathname.includes('payroll')) return 'Payroll Operations';
-    if (location.pathname.includes('project-outsourcing')) return 'Technology Operations';
+    if (pathname.includes('hr-services')) return 'HR Operations';
+    if (pathname.includes('recruitment-manpower')) return 'Recruitment & Manpower';
+    if (pathname.includes('rcu-verification')) return 'RCU & Verification';
+    if (pathname.includes('payroll')) return 'Payroll Operations';
+    if (pathname.includes('project-outsourcing')) return 'Technology Operations';
     return 'HR Operations';
   };
 
   const serviceName = getServiceName();
 
   const handleContactClick = () => {
-    if (location.pathname === '/contact') {
+    if (pathname === '/contact') {
       document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      navigate('/contact');
+      router.push('/contact');
       setTimeout(() => {
         document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);

@@ -1,5 +1,6 @@
+"use client";
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -61,7 +62,7 @@ const Button: React.FC<ButtonProps> = ({
     }
     
     return (
-      <Link to={href} className={buttonClasses}>
+      <Link href={href} className={buttonClasses}>
         {children}
       </Link>
     );

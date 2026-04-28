@@ -1,5 +1,6 @@
+"use client";
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 const ServicesDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,21 +27,21 @@ const ServicesDropdown: React.FC = () => {
         <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg z-10">
           <div className="py-1">
             <Link
-              to="/hr-services"
+              href="/hr-services"
               className="block px-4 py-2 text-gray-700 hover:bg-primary-50 hover:text-primary-600"
               onClick={() => setIsOpen(false)}
             >
               HR Services
             </Link>
             <Link
-              to="/recruitment-manpower"
+              href="/recruitment-manpower"
               className="block px-4 py-2 text-gray-700 hover:bg-primary-50 hover:text-primary-600"
               onClick={() => setIsOpen(false)}
             >
               Recruitment & Manpower
             </Link>
             <Link
-              to="/rcu-verification"
+              href="/rcu-verification"
               className="block px-4 py-2 text-gray-700 hover:bg-primary-50 hover:text-primary-600"
               onClick={() => setIsOpen(false)}
             >

@@ -1,12 +1,13 @@
+"use client";
 import React from 'react';
 import Button from '../ui/Button';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 const HeroSection: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleGetStarted = () => {
-    navigate('/contact');
+    router.push('/contact');
     setTimeout(() => {
       const contactForm = document.getElementById('contact-form');
       if (contactForm) {
@@ -16,7 +17,7 @@ const HeroSection: React.FC = () => {
   };
 
   const handleLearnMore = () => {
-    navigate('/about-us');
+    router.push('/about-us');
   };
 
   return (

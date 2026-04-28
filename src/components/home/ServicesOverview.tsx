@@ -1,12 +1,13 @@
+"use client";
 import React from 'react';
 import { FileText, Users, DollarSign, LineChart, Award, Shield } from 'lucide-react';
 import SectionHeader from '../ui/SectionHeader';
 import ServiceCard from '../ui/ServiceCard';
 import Button from '../ui/Button';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 const ServicesOverview: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const services = [
     {
@@ -48,7 +49,7 @@ const ServicesOverview: React.FC = () => {
   ];
 
   const handleContactClick = () => {
-    navigate('/contact');
+    router.push('/contact');
     setTimeout(() => {
       const el = document.getElementById('contact-form');
       if (el) el.scrollIntoView({ behavior: 'smooth' });

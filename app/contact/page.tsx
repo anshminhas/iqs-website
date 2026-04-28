@@ -1,0 +1,1 @@
+import PageComponent from '../../src/views/Contact'; export default function Page() { return <PageComponent />; }
