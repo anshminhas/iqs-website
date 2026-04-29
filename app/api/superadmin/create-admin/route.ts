@@ -9,6 +9,18 @@ export async function POST(req: Request) {
 
     const { name, email, password } = await req.json();
 
+    // 1. Verify Authentication & Role
+    const { cookies } = await import('next/headers');
+    const { verifyToken } = await import('@/utils/jwt');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('dms_auth')?.value;
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    
+    const payload: any = await verifyToken(token);
+    if (!payload || payload.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Forbidden: Super Admin access required' }, { status: 403 });
+    }
+
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }

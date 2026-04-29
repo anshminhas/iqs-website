@@ -19,7 +19,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'User with this email already exists' }, { status: 409 });
     }
 
-    const superAdminId = req.headers.get('x-user-id'); // Set by middleware
+    // 1. Verify Authentication & Role
+    const { cookies } = await import('next/headers');
+    const { verifyToken } = await import('@/utils/jwt');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('dms_auth')?.value;
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    
+    const payload: any = await verifyToken(token);
+    if (!payload || payload.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Forbidden: Super Admin access required' }, { status: 403 });
+    }
+
+    const superAdminId = payload.id;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
