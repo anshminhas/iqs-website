@@ -266,7 +266,7 @@ export default function SuperAdminClientWorkspace({ params }: { params: Promise<
                            </td>
                            <td className="px-10 py-8">
                               <div className="flex items-center gap-4">
-                                 <a href={doc.file?.url?.replace('/upload/', '/upload/fl_attachment/')} target="_blank" rel="noreferrer" className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-all hover:-translate-y-1">
+                                 <a href={doc.file?.url} target="_blank" rel="noreferrer" className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-all hover:-translate-y-1">
                                     <Eye className="w-5 h-5" />
                                  </a>
                                  <div className="text-right">

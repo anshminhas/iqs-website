@@ -396,7 +396,7 @@ export default function AdminClientWorkspace({ params }: { params: Promise<{ cli
                     <td className="px-10 py-6 text-right">
                       <div className="flex items-center justify-end gap-3">
                         <a 
-                          href={doc.file?.url?.replace('/upload/', '/upload/fl_attachment/')}
+                          href={doc.file?.url}
                           target="_blank" rel="noreferrer"
                           className="p-3 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-2xl text-indigo-600 dark:text-indigo-400 transition-all hover:scale-110 active:scale-95" title="Download"
                         >

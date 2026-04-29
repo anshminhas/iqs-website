@@ -90,7 +90,7 @@ export default function ClientDashboard() {
             </div>
          </div>
          <a 
-           href={docData.file?.url?.replace('/upload/', '/upload/fl_attachment/')}
+           href={docData.file?.url}
            target="_blank" 
            rel="noreferrer"
            className="p-2.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 rounded-xl transition-all active:scale-95 shrink-0 ml-2"
