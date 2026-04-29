@@ -63,18 +63,53 @@ export async function computePayslip(
   // 1. Replace 'Gross Salary' with 'Actual Salary (Uncalculated)'
   const actualSalaryUncalculated = (ctc / daysInMonth) * daysWorked;
 
+  // Helper to find column value by searching common aliases + substring fallback
+  const getFlag = (keys: string[], substringFallback: string) => {
+    const rowKeys = Object.keys(row);
+
+    // 1. Exact alias match (case-insensitive, trimmed)
+    for (const k of keys) {
+      const direct = row[k] ?? row[k.toLowerCase()] ?? row[k.toUpperCase()];
+      if (direct !== undefined && direct !== '') return String(direct).trim().toUpperCase();
+    }
+
+    // 2. Case-insensitive full-key match
+    for (const k of keys) {
+      const match = rowKeys.find(rk => rk.toLowerCase().trim() === k.toLowerCase().trim());
+      if (match) {
+        const v = row[match];
+        if (v !== undefined && v !== '') return String(v).trim().toUpperCase();
+      }
+    }
+
+    // 3. Substring fallback — any column whose name CONTAINS the fallback word
+    //    (e.g. "ESIC Applicability" contains "esic")
+    const sub = substringFallback.toLowerCase();
+    const subMatch = rowKeys.find(rk => rk.toLowerCase().trim().includes(sub));
+    if (subMatch) {
+      const v = row[subMatch];
+      if (v !== undefined && v !== '') return String(v).trim().toUpperCase();
+    }
+
+    return '';
+  };
+
+  // Helper: treat YES / Y / 1 / TRUE as truthy
+  const isTruthy = (flag: string) =>
+    flag === 'YES' || flag === 'Y' || flag === '1' || flag === 'TRUE';
+
   // 2. ESIC Eligibility Check
   // Applicable only if YES and within statutory threshold (21000)
-  const esicFlag = String(row.esic || row.ESIC || '').trim().toUpperCase();
+  const esicFlag = getFlag(['esic', 'ESIC', 'esic_applicable', 'esic_req', 'esic req'], 'esic');
   const esicThreshold = 21000;
-  const isEsicEligible = (esicFlag === 'YES' && actualSalaryUncalculated <= esicThreshold);
-  
+  const isEsicEligible = (isTruthy(esicFlag) && actualSalaryUncalculated <= esicThreshold);
+
   // Default ESIC calculation: 0.75% of actual_salary_uncalculated
   const esicValue = isEsicEligible ? (actualSalaryUncalculated * 0.0075) : 0;
 
   // 3. PF Eligibility Check — only calculate when pf/PF column = "YES" in CSV
-  const pfFlag = String(row.pf || row.PF || '').trim().toUpperCase();
-  const isPfEligible = pfFlag === 'YES';
+  const pfFlag = getFlag(['pf', 'PF', 'pf_applicable', 'pf_req', 'pf req', 'pf_employee'], 'pf');
+  const isPfEligible = isTruthy(pfFlag);
 
   // Parse additional dynamic components with defaults
   const overtime = Math.max(0, Number(row.overtime) || Number(row.Overtime) || 0);
@@ -166,11 +201,13 @@ export async function computePayslip(
       let val = Number(evaluate(comp.formula, { ...scope }));
       
       // HARD OVERRIDE: If ESIC and not eligible → force to 0
-      if (comp.key.toLowerCase() === 'esic' && !isEsicEligible) {
+      const isEsicKey = comp.key.toLowerCase().includes('esic');
+      if (isEsicKey && !isEsicEligible) {
         val = 0;
       }
       // HARD OVERRIDE: If PF and not eligible → force to 0
-      if ((comp.key.toLowerCase() === 'pf' || comp.key.toLowerCase() === 'pf_employee') && !isPfEligible) {
+      const isPfKey = comp.key.toLowerCase().includes('pf') || comp.key.toLowerCase().includes('provident');
+      if (isPfKey && !isPfEligible) {
         val = 0;
       }
       

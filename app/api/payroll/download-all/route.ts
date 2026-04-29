@@ -1,3 +1,6 @@
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/utils/db';
 import mongoose from 'mongoose';
@@ -32,7 +35,7 @@ export async function GET(req: Request) {
     const token = cookieStore.get('dms_auth')?.value;
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const payload: any = await verifyToken(token);
-    if (!payload || (payload.role !== 'admin' && payload.role !== 'superadmin')) {
+    if (!payload || (payload.role !== 'admin' && payload.role !== 'super_admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

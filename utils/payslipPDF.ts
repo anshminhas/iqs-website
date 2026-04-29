@@ -1,6 +1,7 @@
 import PDFDocument from 'pdfkit';
 import { IPayrollComponent } from '@/models/PayrollConfig';
 import path from 'path';
+import fs from 'fs';
 
 export interface PayslipPDFData {
   companyName: string;
@@ -51,9 +52,10 @@ function wordsBelow1000(n: number): string {
 }
 
 function numberToWordsINR(amount: number): string {
-  const rounded = Math.round(amount * 100);
-  const rupees  = Math.floor(rounded / 100);
-  const paisa   = rounded % 100;
+  if (!amount || !isFinite(amount)) return 'Zero Rupees Only';
+  const rounded  = Math.round(amount * 100);
+  const rupees   = Math.floor(rounded / 100);
+  const paisa    = rounded % 100;
   if (rupees === 0 && paisa === 0) return 'Zero Rupees Only';
 
   const crore    = Math.floor(rupees / 10_000_000);
@@ -77,12 +79,16 @@ function fmtINR(n: number): string {
 }
 
 function fmtMonth(m: string): string {
+  if (!m || !m.includes('-')) return m || '';
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December',
   ];
-  const [year, mo] = m.split('-');
-  return `${months[Number(mo) - 1]} ${year}`;
+  const parts = m.split('-');
+  const year = parts[0];
+  const mo = Number(parts[1]);
+  if (isNaN(mo) || mo < 1 || mo > 12) return m;
+  return `${months[mo - 1]} ${year}`;
 }
 
 // ─── Fetch remote image into buffer ──────────────────────
@@ -146,11 +152,11 @@ function cell(
   y: number,
   w: number,
   h: number,
-  opts: { bold?: boolean; size?: number; align?: string; color?: string; pad?: number } = {}
+  opts: { bold?: boolean; size?: number; align?: string; color?: string; pad?: number; fontRegular?: string; fontBold?: string } = {}
 ) {
-  const { bold = false, size = 8.5, align = 'left', color = '#000', pad = 5 } = opts;
+  const { bold = false, size = 8.5, align = 'left', color = '#000', pad = 5, fontRegular = 'Helvetica', fontBold = 'Helvetica-Bold' } = opts;
   doc
-    .font(bold ? 'Main-Bold' : 'Main')
+    .font(bold ? fontBold : fontRegular)
     .fontSize(size)
     .fillColor(color)
     .text(String(text ?? ''), x + pad, y + Math.max(1, (h - size - 1) / 2), {
@@ -162,7 +168,7 @@ function cell(
 }
 
 // ─── Main draw function ───────────────────────────────────
-async function drawPayslip(doc: any, data: PayslipPDFData, logoBuffer: Buffer | null) {
+async function drawPayslip(doc: any, data: PayslipPDFData, logoBuffer: Buffer | null, fontRegular: string, fontBold: string) {
   const effectiveDefs = buildEffectiveDefs(data.componentDefs, data.components);
   const earnings   = effectiveDefs.filter(c => c.type === 'earning'   && !EXCLUDE_KEYS.has(c.key));
   const deductions = effectiveDefs.filter(c => c.type === 'deduction' && !EXCLUDE_KEYS.has(c.key));
@@ -172,8 +178,6 @@ async function drawPayslip(doc: any, data: PayslipPDFData, logoBuffer: Buffer | 
   // ── HEADER ──────────────────────────────────────────────
   const LOGO_SIZE = 60;
 
-  // Outer border for whole page (drawn later once we know total height)
-  // Company info block (centered)
   if (logoBuffer) {
     try {
       doc.image(logoBuffer, L, y + 4, { fit: [LOGO_SIZE, LOGO_SIZE], align: 'left' });
@@ -186,16 +190,16 @@ async function drawPayslip(doc: any, data: PayslipPDFData, logoBuffer: Buffer | 
   const textW   = logoBuffer ? W - LOGO_SIZE - 10  : W;
   const nameY   = y + 8;
 
-  doc.font('Main-Bold').fontSize(15).fillColor('#000')
+  doc.font(fontBold).fontSize(15).fillColor('#000')
      .text(data.companyName.toUpperCase(), textX, nameY, { width: textW, align: 'center' });
 
   if (data.companyAddress) {
-    doc.font('Main').fontSize(8.5).fillColor('#444')
+    doc.font(fontRegular).fontSize(8.5).fillColor('#444')
        .text(data.companyAddress, textX, nameY + 18, { width: textW, align: 'center' });
   }
 
   const titleY = nameY + (data.companyAddress ? 36 : 20);
-  doc.font('Main-Bold').fontSize(11).fillColor('#000')
+  doc.font(fontBold).fontSize(11).fillColor('#000')
      .text(`Payslip for the month of ${fmtMonth(data.month)}`, L, titleY, { width: W, align: 'center' });
 
   y = Math.max(y + LOGO_SIZE + 8, titleY + 18);
@@ -224,15 +228,15 @@ async function drawPayslip(doc: any, data: PayslipPDFData, logoBuffer: Buffer | 
     if (i > 0) hLine(doc, L, ry, W);
 
     // Left label
-    cell(doc, l1, L,       ry, 110, ROW_H, { bold: true, size: 8.5 });
-    cell(doc, ':',  L + 110, ry, 10,  ROW_H, { size: 8.5 });
-    cell(doc, v1,  L + 118, ry, LW - 118, ROW_H, { size: 8.5 });
+    cell(doc, l1, L,       ry, 110, ROW_H, { bold: true, size: 8.5, fontRegular, fontBold });
+    cell(doc, ':',  L + 110, ry, 10,  ROW_H, { size: 8.5, fontRegular, fontBold });
+    cell(doc, v1,  L + 118, ry, LW - 118, ROW_H, { size: 8.5, fontRegular, fontBold });
 
     // Right label
     if (l2) {
-      cell(doc, l2, MID,       ry, 110, ROW_H, { bold: true, size: 8.5 });
-      cell(doc, ':',  MID + 110, ry, 10,  ROW_H, { size: 8.5 });
-      cell(doc, v2,  MID + 118, ry, RW - 118, ROW_H, { size: 8.5 });
+      cell(doc, l2, MID,       ry, 110, ROW_H, { bold: true, size: 8.5, fontRegular, fontBold });
+      cell(doc, ':',  MID + 110, ry, 10,  ROW_H, { size: 8.5, fontRegular, fontBold });
+      cell(doc, v2,  MID + 118, ry, RW - 118, ROW_H, { size: 8.5, fontRegular, fontBold });
     }
   });
 
@@ -261,10 +265,10 @@ async function drawPayslip(doc: any, data: PayslipPDFData, logoBuffer: Buffer | 
   vLine(doc, MID + DED_LBL_W, y, y + edTableH);
 
   // Header text
-  cell(doc, 'Earnings',   L,                y, EARN_LBL_W, HDR_H, { bold: true, size: 9 });
-  cell(doc, 'Amount',     L + EARN_LBL_W,   y, EARN_AMT_W, HDR_H, { bold: true, size: 9, align: 'right' });
-  cell(doc, 'Deductions', MID,              y, DED_LBL_W,  HDR_H, { bold: true, size: 9 });
-  cell(doc, 'Amount',     MID + DED_LBL_W, y, DED_AMT_W,  HDR_H, { bold: true, size: 9, align: 'right' });
+  cell(doc, 'Earnings',   L,                y, EARN_LBL_W, HDR_H, { bold: true, size: 9, fontRegular, fontBold });
+  cell(doc, 'Amount',     L + EARN_LBL_W,   y, EARN_AMT_W, HDR_H, { bold: true, size: 9, align: 'right', fontRegular, fontBold });
+  cell(doc, 'Deductions', MID,              y, DED_LBL_W,  HDR_H, { bold: true, size: 9, fontRegular, fontBold });
+  cell(doc, 'Amount',     MID + DED_LBL_W, y, DED_AMT_W,  HDR_H, { bold: true, size: 9, align: 'right', fontRegular, fontBold });
   hLine(doc, L, y + HDR_H, W, '#aaa');
 
   // Data rows
@@ -275,15 +279,15 @@ async function drawPayslip(doc: any, data: PayslipPDFData, logoBuffer: Buffer | 
     const earn = earnings[i];
     if (earn) {
       const val = data.components[earn.key] ?? 0;
-      cell(doc, earn.label.toUpperCase(), L, ry, EARN_LBL_W, DAT_H, { size: 8.5 });
-      cell(doc, fmtINR(val), L + EARN_LBL_W, ry, EARN_AMT_W, DAT_H, { size: 8.5, align: 'right' });
+      cell(doc, earn.label.toUpperCase(), L, ry, EARN_LBL_W, DAT_H, { size: 8.5, fontRegular, fontBold });
+      cell(doc, fmtINR(val), L + EARN_LBL_W, ry, EARN_AMT_W, DAT_H, { size: 8.5, align: 'right', fontRegular, fontBold });
     }
 
     const ded = deductions[i];
     if (ded) {
       const val = data.components[ded.key] ?? 0;
-      cell(doc, ded.label.toUpperCase(), MID, ry, DED_LBL_W, DAT_H, { size: 8.5 });
-      cell(doc, fmtINR(val), MID + DED_LBL_W, ry, DED_AMT_W, DAT_H, { size: 8.5, align: 'right' });
+      cell(doc, ded.label.toUpperCase(), MID, ry, DED_LBL_W, DAT_H, { size: 8.5, fontRegular, fontBold });
+      cell(doc, fmtINR(val), MID + DED_LBL_W, ry, DED_AMT_W, DAT_H, { size: 8.5, align: 'right', fontRegular, fontBold });
     }
   }
 
@@ -292,24 +296,24 @@ async function drawPayslip(doc: any, data: PayslipPDFData, logoBuffer: Buffer | 
   fillRect(doc, L, totY, W, TOT_H, '#f7f7f7');
   hLine(doc, L, totY, W, '#aaa');
 
-  cell(doc, 'Total Earnings:INR.',   L,              totY, EARN_LBL_W, TOT_H, { bold: true, size: 8.5 });
-  cell(doc, fmtINR(data.earningsTotal), L + EARN_LBL_W, totY, EARN_AMT_W, TOT_H, { bold: true, size: 8.5, align: 'right' });
-  cell(doc, 'Total Deductions:INR.', MID,            totY, DED_LBL_W,  TOT_H, { bold: true, size: 8.5 });
-  cell(doc, fmtINR(data.deductionsTotal), MID + DED_LBL_W, totY, DED_AMT_W, TOT_H, { bold: true, size: 8.5, align: 'right' });
+  cell(doc, 'Total Earnings:INR.',   L,              totY, EARN_LBL_W, TOT_H, { bold: true, size: 8.5, fontRegular, fontBold });
+  cell(doc, fmtINR(data.earningsTotal), L + EARN_LBL_W, totY, EARN_AMT_W, TOT_H, { bold: true, size: 8.5, align: 'right', fontRegular, fontBold });
+  cell(doc, 'Total Deductions:INR.', MID,            totY, DED_LBL_W,  TOT_H, { bold: true, size: 8.5, fontRegular, fontBold });
+  cell(doc, fmtINR(data.deductionsTotal), MID + DED_LBL_W, totY, DED_AMT_W, TOT_H, { bold: true, size: 8.5, align: 'right', fontRegular, fontBold });
 
   y = totY + TOT_H + 14;
 
   // ── NET PAY ──────────────────────────────────────────────
-  doc.font('Main').fontSize(9.5).fillColor('#000')
+  doc.font(fontRegular).fontSize(9.5).fillColor('#000')
      .text('Net Pay for the month :', L, y, { continued: true })
-     .font('Main-Bold').fontSize(10)
+     .font(fontBold).fontSize(10)
      .text(`   ${fmtINR(data.netPay)}`, { lineBreak: false });
 
   y += 18;
 
   // ── AMOUNT IN WORDS ──────────────────────────────────────
   const words = numberToWordsINR(data.netPay);
-  doc.font('Main').fontSize(8.5).fillColor('#222')
+  doc.font(fontRegular).fontSize(8.5).fillColor('#222')
      .text(`(${words})`, L, y, { width: W, align: 'left' });
 
   y += 22;
@@ -317,37 +321,53 @@ async function drawPayslip(doc: any, data: PayslipPDFData, logoBuffer: Buffer | 
   // ── FOOTER ───────────────────────────────────────────────
   hLine(doc, L, y, W, '#ccc');
   y += 6;
-  doc.font('Main').fontSize(7.5).fillColor('#888')
+  doc.font(fontRegular).fontSize(7.5).fillColor('#888')
      .text('This is a system generated payslip and does not require signature.', L, y, { width: W, align: 'center' });
 }
 
 // ─── Public API ───────────────────────────────────────────
+function setupFonts(doc: any): { fontRegular: string; fontBold: string } {
+  const fontDir = path.resolve(process.cwd(), 'public', 'fonts');
+  const regularPath = path.join(fontDir, 'arial.ttf');
+  const boldPath    = path.join(fontDir, 'arialbd.ttf');
+
+  if (fs.existsSync(regularPath) && fs.existsSync(boldPath)) {
+    try {
+      doc.registerFont('Arial',      regularPath);
+      doc.registerFont('Arial-Bold', boldPath);
+      return { fontRegular: 'Arial', fontBold: 'Arial-Bold' };
+    } catch {
+      // fall through
+    }
+  }
+  // Vercel / environments without font files → use PDFKit built-ins
+  return { fontRegular: 'Helvetica', fontBold: 'Helvetica-Bold' };
+}
+
 export async function generatePayslipPDF(data: PayslipPDFData): Promise<Buffer> {
   const logoBuffer = data.logoUrl ? await fetchImageBuffer(data.logoUrl) : null;
 
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({ size: 'A4', margin: 0, bufferPages: true, autoFirstPage: false });
-      const fontDir = path.resolve(process.cwd(), 'public', 'fonts');
-      doc.registerFont('Main',      path.join(fontDir, 'arial.ttf'));
-      doc.registerFont('Main-Bold', path.join(fontDir, 'arialbd.ttf'));
+      const { fontRegular, fontBold } = setupFonts(doc);
 
       doc.addPage();
-      drawPayslip(doc, data, logoBuffer);
+      drawPayslip(doc, data, logoBuffer, fontRegular, fontBold).catch(reject);
 
       const buffers: Buffer[] = [];
       doc.on('data',  (c: Buffer) => buffers.push(c));
       doc.on('end',   () => resolve(Buffer.concat(buffers)));
-      doc.on('error', reject);
+      doc.on('error', (err: any) => { console.error('[PDF]', err); reject(err); });
       doc.end();
     } catch (err) {
+      console.error('[PDF generatePayslipPDF]', err);
       reject(err);
     }
   });
 }
 
 export async function generateMultiPayslipPDF(items: PayslipPDFData[]): Promise<Buffer> {
-  // Pre-fetch all logos in parallel
   const logoMap = new Map<string, Buffer | null>();
   await Promise.all(
     items
@@ -362,22 +382,21 @@ export async function generateMultiPayslipPDF(items: PayslipPDFData[]): Promise<
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({ size: 'A4', margin: 0, bufferPages: true, autoFirstPage: false });
-      const fontDir = path.resolve(process.cwd(), 'public', 'fonts');
-      doc.registerFont('Main',      path.join(fontDir, 'arial.ttf'));
-      doc.registerFont('Main-Bold', path.join(fontDir, 'arialbd.ttf'));
+      const { fontRegular, fontBold } = setupFonts(doc);
 
       for (const item of items) {
         doc.addPage();
         const logo = item.logoUrl ? (logoMap.get(item.logoUrl) ?? null) : null;
-        drawPayslip(doc, item, logo);
+        drawPayslip(doc, item, logo, fontRegular, fontBold).catch(console.error);
       }
 
       const buffers: Buffer[] = [];
       doc.on('data',  (c: Buffer) => buffers.push(c));
       doc.on('end',   () => resolve(Buffer.concat(buffers)));
-      doc.on('error', reject);
+      doc.on('error', (err: any) => { console.error('[PDF Multi]', err); reject(err); });
       doc.end();
     } catch (err) {
+      console.error('[PDF generateMultiPayslipPDF]', err);
       reject(err);
     }
   });

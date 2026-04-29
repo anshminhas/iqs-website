@@ -23,6 +23,10 @@ const COLUMN_MAP: Record<string, string> = {
   'working_days': 'daysWorked',
   'days': 'daysWorked',
   'days_in_month': 'daysInMonth',
+  'esic': 'esic',
+  'esic_req': 'esic',
+  'pf': 'pf',
+  'pf_req': 'pf',
 };
 
 function normalizeRow(raw: Record<string, any>): { data: Record<string, any>; errors: string[] } {
