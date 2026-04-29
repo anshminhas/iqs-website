@@ -122,7 +122,11 @@ export async function GET(req: Request) {
     });
 
   } catch (error: any) {
-    console.error('Payslip download error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const msg = error?.message || String(error);
+    console.error('[DownloadPayslip] Error:', msg, error?.stack);
+    return NextResponse.json(
+      { error: 'PDF generation failed', detail: msg },
+      { status: 500 }
+    );
   }
 }

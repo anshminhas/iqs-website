@@ -75,7 +75,8 @@ function numberToWordsINR(amount: number): string {
 }
 
 function fmtINR(n: number): string {
-  return n.toFixed(2);
+  if (n === null || n === undefined || isNaN(n)) return '0.00';
+  return Number(n).toFixed(2);
 }
 
 function fmtMonth(m: string): string {
