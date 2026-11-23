@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { verifyToken } from '@/utils/jwt';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { ShieldCheck, LayoutDashboard, FileText, Settings, Users, LogOut, Upload, Home } from 'lucide-react';
+import { ShieldCheck, LayoutDashboard, FileText, Settings, Users, LogOut, Upload, Home, Briefcase } from 'lucide-react';
 import LogoutButton from './LogoutButton';
 import { ThemeToggle } from '../../src/components/ThemeToggle';
 
@@ -21,7 +21,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect('/login');
   }
 
-  const role = payload.role as 'super_admin' | 'admin' | 'client';
+  const role = payload.role as 'super_admin' | 'admin' | 'client' | 'recruiter';
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
@@ -50,6 +50,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
                   <FileText className="w-5 h-5 mr-3" />
                   Payroll Engine
                 </Link>
+                <Link href="/dashboard/recruiter" className="flex items-center px-3 py-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg font-medium transition-colors">
+                  <Briefcase className="w-5 h-5 mr-3" />
+                  Recruitment Hub
+                </Link>
               </>
             )}
 
@@ -63,6 +67,20 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <Link href="/dashboard/admin/payroll" className="flex items-center px-3 py-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg font-medium transition-colors">
                   <FileText className="w-5 h-5 mr-3" />
                   Payroll Engine
+                </Link>
+                <Link href="/dashboard/recruiter" className="flex items-center px-3 py-2.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg font-medium transition-colors">
+                  <Briefcase className="w-5 h-5 mr-3" />
+                  Recruitment Hub
+                </Link>
+              </>
+            )}
+
+            {role === 'recruiter' && (
+              <>
+                <div className="px-3 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 mt-4">Recruitment</div>
+                <Link href="/dashboard/recruiter" className="flex items-center px-3 py-2.5 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 rounded-lg font-medium transition-colors">
+                  <Briefcase className="w-5 h-5 mr-3" />
+                  Recruitment Hub
                 </Link>
               </>
             )}
