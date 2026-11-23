@@ -6,6 +6,7 @@ const ROLE_TO_PATH: Record<string, string> = {
   super_admin: '/dashboard/superadmin',
   admin: '/dashboard/admin',
   client: '/dashboard/client',
+  recruiter: '/dashboard/recruiter',
 };
 
 export default async function DashboardRootPage() {

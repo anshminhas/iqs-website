@@ -11,7 +11,8 @@ import {
   ChevronRight, 
   ExternalLink,
   ShieldCheck,
-  KeyRound
+  KeyRound,
+  Briefcase
 } from 'lucide-react';
 import Link from 'next/link';
 import { createAdmin, createClient, assignClientToAdmin, updateClientCategories } from '@/app/actions/superadmin.actions';
@@ -59,7 +60,7 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
   };
 
   // User form states
-  const [showForm, setShowForm] = useState<'admin' | 'client' | null>(null);
+  const [showForm, setShowForm] = useState<'admin' | 'client' | 'recruiter' | null>(null);
   const [formData, setFormData] = useState<{
     name: string;
     companyName: string;
@@ -89,6 +90,18 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
           throw new Error(errorData.error || 'Server error');
         }
         alert('Admin created successfully');
+      } else if (showForm === 'recruiter') {
+        const res = await fetch('/api/superadmin/create-recruiter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ name: formData.name, email: formData.email, password: formData.password })
+        });
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ error: 'Error creating recruiter' }));
+          throw new Error(errorData.error || 'Server error');
+        }
+        alert('Recruiter created successfully');
       } else if (showForm === 'client') {
         const res = await fetch('/api/superadmin/create-client', {
           method: 'POST',
@@ -228,9 +241,12 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
 
       {activeTab === 'users' && (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <button onClick={() => setShowForm('admin')} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold flex items-center shadow-lg shadow-indigo-100 transition-all active:scale-95">
               <UserPlus className="w-4 h-4 mr-2" /> Create Administrative Account
+            </button>
+            <button onClick={() => setShowForm('recruiter')} className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-bold flex items-center shadow-lg shadow-purple-100 transition-all active:scale-95">
+              <Briefcase className="w-4 h-4 mr-2" /> Create Recruiter Account
             </button>
             <button onClick={() => setShowForm('client')} className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold flex items-center shadow-lg shadow-emerald-100 transition-all active:scale-95">
               <Building2 className="w-4 h-4 mr-2" /> Register Corporate Client
@@ -239,12 +255,14 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
 
           {showForm && (
             <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl animate-in zoom-in-95 duration-300">
-              <h3 className="text-2xl font-black italic uppercase mb-6">Create New {showForm === 'admin' ? 'Administrator' : 'Client Profile'}</h3>
+              <h3 className="text-2xl font-black italic uppercase mb-6">
+                Create New {showForm === 'admin' ? 'Administrator' : showForm === 'recruiter' ? 'Recruiter Account' : 'Client Profile'}
+              </h3>
               <form onSubmit={handleCreateUser} className="grid grid-cols-2 gap-6">
-                {showForm === 'admin' ? (
-                  <input type="text" placeholder="Full Employee Name" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="border-none bg-gray-50 rounded-2xl px-5 py-4 font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
-                ) : (
+                {showForm === 'client' ? (
                   <input type="text" placeholder="Registered Company Name" required value={formData.companyName} onChange={e => setFormData({...formData, companyName: e.target.value})} className="border-none bg-gray-50 rounded-2xl px-5 py-4 font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+                ) : (
+                  <input type="text" placeholder={showForm === 'recruiter' ? "Recruiter Full Name" : "Full Employee Name"} required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="border-none bg-gray-50 rounded-2xl px-5 py-4 font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
                 )}
                 <input type="email" placeholder="Official Email Address" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="border-none bg-gray-50 rounded-2xl px-5 py-4 font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
                 <input type="password" placeholder="System Generated Password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="border-none bg-gray-50 rounded-2xl px-5 py-4 font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
@@ -346,7 +364,7 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full translate-x-16 -translate-y-16 group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
               <h3 className="font-black text-xs uppercase tracking-[0.2em] mb-8 flex items-center text-gray-400 relative z-10">
@@ -372,6 +390,37 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
                     </Link>
                   </li>
                 ))}
+              </ul>
+            </div>
+
+            <div className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-full translate-x-16 -translate-y-16 group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
+              <h3 className="font-black text-xs uppercase tracking-[0.2em] mb-8 flex items-center text-gray-400 relative z-10">
+                <Briefcase className="w-4 h-4 mr-2 text-purple-500" /> Recruitment Team
+              </h3>
+              <ul className="space-y-3 relative z-20">
+                {(!data.recruiters || data.recruiters.length === 0) ? (
+                  <li className="text-xs text-gray-400 italic p-6 text-center bg-gray-50/50 rounded-[2rem]">
+                    No recruiters created yet. Use &ldquo;Create Recruiter Account&rdquo; above.
+                  </li>
+                ) : (
+                  data.recruiters.map((r: any) => (
+                    <li key={r._id || r.id} className="flex items-center justify-between p-5 rounded-[2rem] bg-gray-50/50 border border-transparent hover:border-purple-100 hover:bg-white hover:shadow-lg hover:shadow-purple-500/5 transition-all">
+                      <div className="min-w-0 flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-xs uppercase">
+                          {r.name.substring(0, 2)}
+                        </div>
+                        <div>
+                          <p className="font-black text-sm truncate uppercase tracking-tight">{r.name}</p>
+                          <p className="text-[10px] text-gray-400 font-bold truncate uppercase tracking-tight">{r.email}</p>
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full">
+                        Recruiter
+                      </span>
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
             

@@ -10,10 +10,13 @@ export async function GET() {
     // Fetch all admins (excluding passwords)
     const admins = await User.find({ role: 'admin' }, { password: 0 }).sort({ createdAt: -1 });
 
+    // Fetch all recruiters (excluding passwords)
+    const recruiters = await User.find({ role: 'recruiter' }, { password: 0 }).sort({ createdAt: -1 });
+
     // Fetch all clients
     const clients = await Client.find({}).sort({ createdAt: -1 });
 
-    return NextResponse.json({ admins, clients }, { status: 200 });
+    return NextResponse.json({ admins, clients, recruiters }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Error fetching users' }, { status: 500 });
   }

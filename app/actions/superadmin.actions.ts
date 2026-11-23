@@ -48,12 +48,14 @@ export async function assignClientToAdmin(adminId: string, clientId: string) {
 export async function getSuperAdminData() {
   await connectToDatabase();
   const admins = await User.find({ role: 'admin' }).populate('assignedClients', 'companyName');
+  const recruiters = await User.find({ role: 'recruiter' }, { password: 0 }).sort({ createdAt: -1 });
   const clients = await Client.find().populate('assignedAdminIds', 'name');
   const categories = await Category.find();
   const logs = await ActivityLog.find().sort({ createdAt: -1 }).limit(50).populate('adminId', 'name');
   
   return {
     admins: JSON.parse(JSON.stringify(admins)),
+    recruiters: JSON.parse(JSON.stringify(recruiters)),
     clients: JSON.parse(JSON.stringify(clients)),
     categories: JSON.parse(JSON.stringify(categories)),
     logs: JSON.parse(JSON.stringify(logs))
