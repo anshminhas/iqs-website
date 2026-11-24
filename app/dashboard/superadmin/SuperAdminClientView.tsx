@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Building2, 
@@ -12,17 +12,48 @@ import {
   ExternalLink,
   ShieldCheck,
   KeyRound,
-  Briefcase
+  Briefcase,
+  Search,
+  Calendar,
+  Phone,
+  Mail,
+  CheckCircle2,
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { createAdmin, createClient, assignClientToAdmin, updateClientCategories } from '@/app/actions/superadmin.actions';
+import { CANDIDATE_STATUSES } from '@/src/types/candidate';
 
 export default function SuperAdminClientView({ initialData }: { initialData: any }) {
-  const [activeTab, setActiveTab] = useState<'users' | 'assignments' | 'categories' | 'logs' | 'security'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'recruitment' | 'assignments' | 'categories' | 'logs' | 'security'>('users');
   const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string>('');
+
+  // Recruitment overview state
+  const [recOverview, setRecOverview] = useState<{
+    recruiters: any[];
+    companies: any[];
+    candidates: any[];
+    stats: any;
+  } | null>(null);
+  const [recLoading, setRecLoading] = useState(false);
+  const [recSearch, setRecSearch] = useState('');
+  const [recFilterStatus, setRecFilterStatus] = useState('ALL');
+  const [recFilterRecruiter, setRecFilterRecruiter] = useState('ALL');
+
+  useEffect(() => {
+    if (activeTab === 'recruitment' && !recOverview) {
+      setRecLoading(true);
+      fetch('/api/superadmin/recruitment-overview', { credentials: 'include' })
+        .then((r) => r.json())
+        .then((d) => setRecOverview(d))
+        .catch(console.error)
+        .finally(() => setRecLoading(false));
+    }
+  }, [activeTab, recOverview]);
 
   // Password change state
   const [pwdForm, setPwdForm] = useState({ email: '', password: '', confirm: '' });
@@ -152,9 +183,10 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
         </div>
       </div>
 
-      <div className="flex border-b border-gray-100 gap-8 mb-8">
+      <div className="flex border-b border-gray-100 gap-8 mb-8 overflow-x-auto">
         {[
           { id: 'users', label: 'Users & Clients', icon: Users },
+          { id: 'recruitment', label: 'Recruitment Hub', icon: Briefcase },
           { id: 'assignments', label: 'Assignments', icon: List },
           { id: 'categories', label: 'Categories', icon: Settings },
           { id: 'logs', label: 'Activity Logs', icon: Activity },
@@ -405,19 +437,27 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
                   </li>
                 ) : (
                   data.recruiters.map((r: any) => (
-                    <li key={r._id || r.id} className="flex items-center justify-between p-5 rounded-[2rem] bg-gray-50/50 border border-transparent hover:border-purple-100 hover:bg-white hover:shadow-lg hover:shadow-purple-500/5 transition-all">
-                      <div className="min-w-0 flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-xs uppercase">
-                          {r.name.substring(0, 2)}
+                    <li key={r._id || r.id}>
+                      <Link
+                        href={`/dashboard/superadmin/recruiter/${r._id || r.id}`}
+                        className="flex items-center justify-between p-5 rounded-[2rem] bg-gray-50/50 border border-transparent hover:border-purple-100 hover:bg-white hover:shadow-xl hover:shadow-purple-500/5 hover:-translate-y-1 transition-all group cursor-pointer"
+                      >
+                        <div className="min-w-0 flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-xs uppercase">
+                            {r.name.substring(0, 2)}
+                          </div>
+                          <div>
+                            <p className="font-black text-sm truncate uppercase tracking-tight">{r.name}</p>
+                            <p className="text-[10px] text-gray-400 font-bold truncate uppercase tracking-tight">{r.email}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-black text-sm truncate uppercase tracking-tight">{r.name}</p>
-                          <p className="text-[10px] text-gray-400 font-bold truncate uppercase tracking-tight">{r.email}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full">
+                            Recruiter
+                          </span>
+                          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
                         </div>
-                      </div>
-                      <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full">
-                        Recruiter
-                      </span>
+                      </Link>
                     </li>
                   ))
                 )}
@@ -454,6 +494,319 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
                 ))}
               </ul>
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'recruitment' && (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-bold text-xs uppercase tracking-wider rounded-full flex items-center gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5" /> Centralized Recruitment Command
+                </span>
+              </div>
+              <h2 className="text-3xl font-black text-gray-900 dark:text-white uppercase italic tracking-tight">
+                Recruitment Portfolio Overview
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 text-xs font-medium mt-0.5">
+                Monitor all recruiters, their partner companies, and all candidate pipelines across the organization.
+              </p>
+            </div>
+
+            <Link
+              href="/dashboard/recruiter"
+              className="px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-purple-200 dark:shadow-purple-900/20 active:scale-95 transition-all"
+            >
+              <ExternalLink className="w-4 h-4" /> Open Recruiter Portal
+            </Link>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-black uppercase tracking-wider text-gray-400">Total Recruiters</span>
+                <Users className="w-5 h-5 text-purple-600" />
+              </div>
+              <div className="text-3xl font-black text-gray-900 dark:text-white">
+                {recOverview?.stats?.totalRecruiters ?? data.recruiters?.length ?? 0}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">Active recruiter staff</p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-black uppercase tracking-wider text-gray-400">Partner Companies</span>
+                <Building2 className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div className="text-3xl font-black text-gray-900 dark:text-white">
+                {recOverview?.stats?.totalCompanies ?? 0}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">Clients being recruited for</p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-black uppercase tracking-wider text-gray-400">Total Candidates</span>
+                <Briefcase className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="text-3xl font-black text-gray-900 dark:text-white">
+                {recOverview?.stats?.totalCandidates ?? 0}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">Registered applications</p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-black uppercase tracking-wider text-gray-400">Selected / Hired</span>
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                {recOverview?.stats?.selectedCount ?? 0}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">Confirmed offers & joining</p>
+            </div>
+          </div>
+
+          {/* Recruiters Breakdown Cards */}
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-700 shadow-sm space-y-5">
+            <h3 className="font-black text-xs uppercase tracking-[0.2em] text-gray-400 flex items-center">
+              <Users className="w-4 h-4 mr-2 text-purple-600" /> Active Recruiters & Assigned Volumes
+            </h3>
+
+            {recLoading && !recOverview ? (
+              <div className="py-12 flex justify-center">
+                <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (!recOverview?.recruiters || recOverview.recruiters.length === 0) ? (
+              <div className="p-8 text-center text-xs text-gray-400 italic bg-gray-50 dark:bg-gray-700/30 rounded-2xl">
+                No recruiter accounts created yet.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recOverview.recruiters.map((r: any) => (
+                  <div
+                    key={r._id}
+                    className="p-6 rounded-[2rem] bg-gray-50/70 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 flex flex-col justify-between space-y-4 hover:border-purple-200 transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-black text-sm flex items-center justify-center uppercase flex-shrink-0">
+                          {r.name.substring(0, 2)}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-black text-sm text-gray-900 dark:text-white truncate uppercase">
+                            {r.name}
+                          </h4>
+                          <p className="text-[11px] text-gray-400 font-bold truncate">{r.email}</p>
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full">
+                        Recruiter
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100 dark:border-gray-700 text-center">
+                      <div className="bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <span className="text-[10px] text-gray-400 font-bold block uppercase">Companies</span>
+                        <span className="text-base font-black text-gray-900 dark:text-white">{r.companiesCount || 0}</span>
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <span className="text-[10px] text-gray-400 font-bold block uppercase">Candidates</span>
+                        <span className="text-base font-black text-gray-900 dark:text-white">{r.candidatesCount || 0}</span>
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <span className="text-[10px] text-emerald-600 font-bold block uppercase">Hired</span>
+                        <span className="text-base font-black text-emerald-600">{r.selectedCount || 0}</span>
+                      </div>
+                    </div>
+
+                    <Link
+                      href={`/dashboard/superadmin/recruiter/${r._id}`}
+                      className="w-full py-2.5 bg-white dark:bg-gray-800 hover:bg-purple-600 hover:text-white text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm group"
+                    >
+                      <span>View All Companies & Candidates</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Master Candidate Registry */}
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-700 shadow-sm space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h3 className="font-black text-base uppercase italic tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
+                  <Users className="w-5 h-5 text-purple-600" /> Master Candidate Registry ({recOverview?.candidates?.length || 0})
+                </h3>
+                <p className="text-xs text-gray-400 font-medium mt-0.5">
+                  Complete candidate database across all recruiters with status and joining dates.
+                </p>
+              </div>
+            </div>
+
+            {/* Filter controls */}
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="relative flex-1 w-full">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search by candidate name, phone, email, role, company, or recruiter..."
+                  value={recSearch}
+                  onChange={(e) => setRecSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <select
+                value={recFilterRecruiter}
+                onChange={(e) => setRecFilterRecruiter(e.target.value)}
+                className="w-full sm:w-auto px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold outline-none text-gray-700 dark:text-gray-200"
+              >
+                <option value="ALL">All Recruiters</option>
+                {recOverview?.recruiters?.map((r: any) => (
+                  <option key={r._id} value={r._id}>
+                    {r.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={recFilterStatus}
+                onChange={(e) => setRecFilterStatus(e.target.value)}
+                className="w-full sm:w-auto px-4 py-2.5 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold outline-none text-gray-700 dark:text-gray-200"
+              >
+                <option value="ALL">All Statuses</option>
+                {CANDIDATE_STATUSES.map((st) => (
+                  <option key={st} value={st}>
+                    {st}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Table */}
+            {recLoading && !recOverview ? (
+              <div className="py-12 flex justify-center">
+                <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (!recOverview?.candidates || recOverview.candidates.length === 0) ? (
+              <div className="py-12 text-center text-gray-400 text-xs italic">
+                No candidates registered yet.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-100 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-700/20 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                      <th className="py-3 px-4">Candidate</th>
+                      <th className="py-3 px-4">Recruiter</th>
+                      <th className="py-3 px-4">Company</th>
+                      <th className="py-3 px-4">Role Applied</th>
+                      <th className="py-3 px-4">Contact</th>
+                      <th className="py-3 px-4">Application Status</th>
+                      <th className="py-3 px-4">Joining Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50 text-xs">
+                    {recOverview.candidates
+                      .filter((c: any) => {
+                        const matchRecruiter =
+                          recFilterRecruiter === 'ALL' ||
+                          String(c.createdBy?._id || c.createdBy) === recFilterRecruiter;
+                        const matchStatus = recFilterStatus === 'ALL' || c.status === recFilterStatus;
+                        const q = recSearch.toLowerCase().trim();
+                        const matchSearch =
+                          !q ||
+                          c.name?.toLowerCase().includes(q) ||
+                          c.phno?.toLowerCase().includes(q) ||
+                          c.email?.toLowerCase().includes(q) ||
+                          c.role?.toLowerCase().includes(q) ||
+                          c.companyName?.toLowerCase().includes(q) ||
+                          c.createdBy?.name?.toLowerCase().includes(q);
+
+                        return matchRecruiter && matchStatus && matchSearch;
+                      })
+                      .map((c: any) => (
+                        <tr key={c._id} className="hover:bg-gray-50/60 dark:hover:bg-gray-700/30 transition-colors">
+                          <td className="py-3.5 px-4 font-bold text-gray-900 dark:text-white">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-black text-xs flex items-center justify-center">
+                                {c.name.substring(0, 2).toUpperCase()}
+                              </div>
+                              <div>
+                                <div>{c.name}</div>
+                                <span className="text-[10px] text-gray-400 font-normal">
+                                  {new Date(c.createdAt).toLocaleDateString('en-IN', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4 font-medium text-gray-600 dark:text-gray-300">
+                            {c.createdBy?.name ? (
+                              <Link
+                                href={`/dashboard/superadmin/recruiter/${c.createdBy._id || c.createdBy}`}
+                                className="hover:text-purple-600 font-bold flex items-center gap-1"
+                              >
+                                <span>{c.createdBy.name}</span>
+                                <ExternalLink className="w-3 h-3 text-gray-400" />
+                              </Link>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 font-bold text-gray-700 dark:text-gray-300">
+                            {c.companyName}
+                          </td>
+
+                          <td className="py-3.5 px-4 font-semibold text-gray-800 dark:text-gray-200">
+                            {c.role}
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-1 text-gray-600 dark:text-gray-300">
+                                <Phone className="w-3 h-3 text-gray-400" /> {c.phno}
+                              </div>
+                              <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                                <Mail className="w-3 h-3 text-gray-400" /> {c.email}
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <span className="inline-block text-[10px] font-black uppercase px-2.5 py-1 rounded-lg border bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
+                              {c.status}
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            {c.joiningDate ? (
+                              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-lg">
+                                <Calendar className="w-3 h-3" />
+                                {c.joiningDate}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 text-[11px] italic">-</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -25,7 +25,7 @@ import {
   ChevronDown,
   Sparkles,
 } from 'lucide-react';
-import { CANDIDATE_STATUSES, CandidateStatus } from '@/src/types/candidate';
+import { CANDIDATE_STATUSES, CandidateStatus, CandidateItem } from '@/src/types/candidate';
 
 interface Company {
   _id: string;
@@ -34,20 +34,6 @@ interface Company {
   location?: string;
   website?: string;
   description?: string;
-}
-
-interface CandidateItem {
-  _id: string;
-  name: string;
-  phno: string;
-  email: string;
-  role: string;
-  companyId: string;
-  companyName: string;
-  status: CandidateStatus;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 const STATUS_COLORS: Record<CandidateStatus, { bg: string; text: string; border: string }> = {
@@ -114,9 +100,19 @@ export default function CompanyCandidateTrackerPage({
     email: '',
     role: '',
     status: 'Applied' as CandidateStatus,
+    joiningDate: '',
     notes: '',
   });
   const [formError, setFormError] = useState('');
+
+  // Join Date Prompt Modal for Selected / Onboarded status
+  const [joinDatePrompt, setJoinDatePrompt] = useState<{
+    candidateId: string;
+    candidateName: string;
+    targetStatus: CandidateStatus;
+    joiningDate: string;
+  } | null>(null);
+  const [savingJoinDate, setSavingJoinDate] = useState(false);
 
   // Status updating feedback
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -202,6 +198,7 @@ export default function CompanyCandidateTrackerPage({
         email: '',
         role: '',
         status: 'Applied',
+        joiningDate: '',
         notes: '',
       });
     } catch (err: any) {
@@ -211,19 +208,69 @@ export default function CompanyCandidateTrackerPage({
     }
   };
 
-  // Handle Quick Status Update
-  const handleUpdateStatus = async (candidateId: string, newStatus: CandidateStatus) => {
+  // Status Change Request: Intercepts Selected / Onboarded to request a Joining Date
+  const handleStatusChangeRequest = (candidate: CandidateItem, newStatus: CandidateStatus) => {
+    if (newStatus === 'Selected' || newStatus === 'Onboarded') {
+      setJoinDatePrompt({
+        candidateId: candidate._id,
+        candidateName: candidate.name,
+        targetStatus: newStatus,
+        joiningDate: candidate.joiningDate || '',
+      });
+    } else {
+      handleUpdateStatus(candidate._id, newStatus);
+    }
+  };
+
+  // Confirm Join Date from the prompt modal
+  const handleConfirmJoinDate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!joinDatePrompt) return;
+    if (!joinDatePrompt.joiningDate) {
+      alert('Please specify a joining date.');
+      return;
+    }
+
+    setSavingJoinDate(true);
+    await handleUpdateStatus(
+      joinDatePrompt.candidateId,
+      joinDatePrompt.targetStatus,
+      joinDatePrompt.joiningDate
+    );
+    setSavingJoinDate(false);
+    setJoinDatePrompt(null);
+  };
+
+  // Handle Quick Status & Optional Join Date Update
+  const handleUpdateStatus = async (
+    candidateId: string,
+    newStatus: CandidateStatus,
+    joiningDate?: string
+  ) => {
     setUpdatingId(candidateId);
     // Optimistic UI update
     setCandidates((prev) =>
-      prev.map((c) => (c._id === candidateId ? { ...c, status: newStatus } : c))
+      prev.map((c) =>
+        c._id === candidateId
+          ? {
+              ...c,
+              status: newStatus,
+              joiningDate: joiningDate !== undefined ? joiningDate : c.joiningDate,
+            }
+          : c
+      )
     );
 
     try {
+      const payload: Record<string, any> = { status: newStatus };
+      if (joiningDate !== undefined) {
+        payload.joiningDate = joiningDate;
+      }
+
       const res = await fetchWithAuth(`/api/recruiter/candidates/${candidateId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         throw new Error('Failed to update status');
@@ -494,22 +541,64 @@ export default function CompanyCandidateTrackerPage({
 
                         {/* Application Status (Dropdown to update on the fly) */}
                         <td className="py-4 px-6">
-                          <div className="relative inline-block">
-                            <select
-                              value={c.status}
-                              disabled={updatingId === c._id}
-                              onChange={(e) =>
-                                handleUpdateStatus(c._id, e.target.value as CandidateStatus)
-                              }
-                              className={`appearance-none text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border outline-none cursor-pointer pr-7 transition-all ${color.bg} ${color.text} ${color.border}`}
-                            >
-                              {CANDIDATE_STATUSES.map((st) => (
-                                <option key={st} value={st} className="bg-white text-gray-900">
-                                  {st}
-                                </option>
-                              ))}
-                            </select>
-                            <ChevronDown className="w-3 h-3 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-60" />
+                          <div className="space-y-1.5">
+                            <div className="relative inline-block">
+                              <select
+                                value={c.status}
+                                disabled={updatingId === c._id}
+                                onChange={(e) =>
+                                  handleStatusChangeRequest(c, e.target.value as CandidateStatus)
+                                }
+                                className={`appearance-none text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border outline-none cursor-pointer pr-7 transition-all ${color.bg} ${color.text} ${color.border}`}
+                              >
+                                {CANDIDATE_STATUSES.map((st) => (
+                                  <option key={st} value={st} className="bg-white text-gray-900">
+                                    {st}
+                                  </option>
+                                ))}
+                              </select>
+                              <ChevronDown className="w-3 h-3 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-60" />
+                            </div>
+
+                            {(c.status === 'Selected' || c.status === 'Onboarded') && (
+                              <div>
+                                {c.joiningDate ? (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setJoinDatePrompt({
+                                        candidateId: c._id,
+                                        candidateName: c.name,
+                                        targetStatus: c.status,
+                                        joiningDate: c.joiningDate || '',
+                                      })
+                                    }
+                                    className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all"
+                                    title="Click to edit joining date"
+                                  >
+                                    <Calendar className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                    <span>Join: {c.joiningDate}</span>
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setJoinDatePrompt({
+                                        candidateId: c._id,
+                                        candidateName: c.name,
+                                        targetStatus: c.status,
+                                        joiningDate: '',
+                                      })
+                                    }
+                                    className="flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 px-2.5 py-1 rounded-lg hover:bg-amber-100 transition-all animate-pulse"
+                                    title="Set joining date"
+                                  >
+                                    <Clock className="w-3 h-3" />
+                                    + Set Join Date
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </td>
 
@@ -648,6 +737,23 @@ export default function CompanyCandidateTrackerPage({
                   </div>
                 </div>
 
+                {(candidateForm.status === 'Selected' || candidateForm.status === 'Onboarded') && (
+                  <div>
+                    <label className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block mb-1.5 flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" /> Joining Date *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={candidateForm.joiningDate}
+                      onChange={(e) =>
+                        setCandidateForm({ ...candidateForm, joiningDate: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-xl text-sm font-bold text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                )}
+
                 <div>
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-wider block mb-1.5">
                     Recruiting Company
@@ -687,6 +793,67 @@ export default function CompanyCandidateTrackerPage({
                     className="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2"
                   >
                     {submitting ? 'Registering...' : 'Add Candidate'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+        {/* Modal: Set Joining Date for Selected / Onboarded */}
+        {joinDatePrompt && (
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-2xl max-w-md w-full p-8 relative animate-in zoom-in-95 duration-200">
+              <button
+                type="button"
+                onClick={() => setJoinDatePrompt(null)}
+                className="absolute top-6 right-6 p-2 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
+                  <Calendar className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900 dark:text-white uppercase italic">
+                  Set Joining Date
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">
+                  Candidate <span className="font-bold text-gray-900 dark:text-white">&ldquo;{joinDatePrompt.candidateName}&rdquo;</span> is marked as{' '}
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{joinDatePrompt.targetStatus}</span>. Please specify their joining date.
+                </p>
+              </div>
+
+              <form onSubmit={handleConfirmJoinDate} className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-wider block mb-1.5">
+                    Confirmed / Expected Joining Date *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={joinDatePrompt.joiningDate}
+                    onChange={(e) =>
+                      setJoinDatePrompt({ ...joinDatePrompt, joiningDate: e.target.value })
+                    }
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm font-bold text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-3">
+                  <button
+                    type="button"
+                    onClick={() => setJoinDatePrompt(null)}
+                    className="px-5 py-3 text-sm font-bold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingJoinDate}
+                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2"
+                  >
+                    {savingJoinDate ? 'Saving...' : 'Confirm Status & Date'}
                   </button>
                 </div>
               </form>

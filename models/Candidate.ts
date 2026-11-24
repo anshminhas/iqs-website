@@ -27,6 +27,7 @@ export interface ICandidate extends Document {
   companyId: mongoose.Types.ObjectId;
   companyName: string;
   status: CandidateStatus;
+  joiningDate?: string;
   notes?: string;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
@@ -46,6 +47,7 @@ const CandidateSchema: Schema = new Schema({
     default: 'Applied',
     index: true,
   },
+  joiningDate: { type: String, default: '' },
   notes: { type: String, default: '' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });

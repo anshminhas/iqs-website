@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { name, phno, email, role, companyId, notes } = body;
+    const { name, phno, email, role, companyId, notes, joiningDate } = body;
     let { companyName, status } = body;
 
     if (!name || !phno || !email || !role || !companyId) {
@@ -109,6 +109,7 @@ export async function POST(req: Request) {
       companyId,
       companyName: companyName.trim(),
       status,
+      joiningDate: joiningDate?.trim() || '',
       notes: notes?.trim() || '',
       createdBy: payload.id,
     });

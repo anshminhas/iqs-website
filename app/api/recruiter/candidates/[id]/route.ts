@@ -36,6 +36,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (body.phno !== undefined) updateFields.phno = String(body.phno).trim();
     if (body.email !== undefined) updateFields.email = String(body.email).trim();
     if (body.role !== undefined) updateFields.role = String(body.role).trim();
+    if (body.joiningDate !== undefined) updateFields.joiningDate = String(body.joiningDate).trim();
     if (body.notes !== undefined) updateFields.notes = String(body.notes).trim();
 
     const updated = await Candidate.findByIdAndUpdate(id, updateFields, { new: true });
