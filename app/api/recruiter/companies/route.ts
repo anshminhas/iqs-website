@@ -21,8 +21,9 @@ export async function GET() {
     const payload = await getAuthPayload();
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Fetch all recruiting companies
-    const companies = await RecruitingCompany.find({})
+    // Fetch companies: recruiters only see companies they created; super_admins see all
+    const query = payload.role === 'recruiter' ? { createdBy: payload.id } : {};
+    const companies = await RecruitingCompany.find(query)
       .sort({ createdAt: -1 })
       .lean();
 

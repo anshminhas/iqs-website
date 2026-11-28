@@ -83,6 +83,7 @@ export default function CompanyCandidateTrackerPage({
   const { isAuthInitialized, fetchWithAuth } = useAuth();
 
   const [company, setCompany] = useState<Company | null>(null);
+  const [accessDenied, setAccessDenied] = useState(false);
   const [candidates, setCandidates] = useState<CandidateItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -124,9 +125,13 @@ export default function CompanyCandidateTrackerPage({
       const data = await res.json();
       if (res.ok && data.company) {
         setCompany(data.company);
+        setAccessDenied(false);
+      } else {
+        setAccessDenied(true);
       }
     } catch (err) {
       console.error('Failed to load company', err);
+      setAccessDenied(true);
     }
   }, [companyId, fetchWithAuth]);
 
@@ -308,6 +313,30 @@ export default function CompanyCandidateTrackerPage({
     },
     {} as Record<string, number>
   );
+
+  if (accessDenied) {
+    return (
+      <AuthBoundary requiredRole={['recruiter', 'super_admin']}>
+        <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 p-12 text-center max-w-xl mx-auto my-12 shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-4">
+            <Building2 className="w-8 h-8" />
+          </div>
+          <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 uppercase italic">
+            Company Access Restricted
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
+            This company either does not exist or was created by another recruiter. You can only view and manage companies created under your recruiter account.
+          </p>
+          <Link
+            href="/dashboard/recruiter"
+            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-sm inline-flex items-center gap-2 transition-all shadow-md"
+          >
+            <ArrowLeft className="w-4 h-4" /> Return to My Dashboard
+          </Link>
+        </div>
+      </AuthBoundary>
+    );
+  }
 
   return (
     <AuthBoundary requiredRole={['recruiter', 'super_admin']}>

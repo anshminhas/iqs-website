@@ -27,6 +27,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ companyI
       return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     }
 
+    // Recruiters can only access companies they created
+    if (payload.role === 'recruiter' && company.createdBy?.toString() !== payload.id) {
+      return NextResponse.json({ error: 'Company not found or access denied' }, { status: 404 });
+    }
+
     const candidateCount = await Candidate.countDocuments({ companyId });
 
     return NextResponse.json(
@@ -50,6 +55,16 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ compa
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { companyId } = await params;
+    const company = await RecruitingCompany.findById(companyId);
+    if (!company) {
+      return NextResponse.json({ error: 'Company not found' }, { status: 404 });
+    }
+
+    // Only creator recruiter or super_admin can delete
+    if (payload.role === 'recruiter' && company.createdBy?.toString() !== payload.id) {
+      return NextResponse.json({ error: 'Forbidden: Access denied' }, { status: 403 });
+    }
+
     await Candidate.deleteMany({ companyId });
     await RecruitingCompany.findByIdAndDelete(companyId);
 

@@ -27,26 +27,42 @@ export async function GET(req: Request) {
     const search = searchParams.get('search');
     const sort = searchParams.get('sort') || 'newest';
 
-    const filter: Record<string, any> = {};
+    const conditions: any[] = [];
 
     if (companyId) {
-      filter.companyId = companyId;
+      if (payload.role === 'recruiter') {
+        const company = await RecruitingCompany.findOne({ _id: companyId, createdBy: payload.id });
+        if (!company) {
+          return NextResponse.json({ error: 'Company not found or access denied' }, { status: 404 });
+        }
+      }
+      conditions.push({ companyId });
+    } else if (payload.role === 'recruiter') {
+      const myCompanies = await RecruitingCompany.find({ createdBy: payload.id }, { _id: 1 }).lean();
+      const myCompanyIds = myCompanies.map((c: any) => c._id);
+      conditions.push({
+        $or: [{ createdBy: payload.id }, { companyId: { $in: myCompanyIds } }],
+      });
     }
 
     if (status && status !== 'ALL' && status !== 'All') {
-      filter.status = status;
+      conditions.push({ status });
     }
 
     if (search && search.trim()) {
       const q = search.trim();
-      filter.$or = [
-        { name: { $regex: q, $options: 'i' } },
-        { email: { $regex: q, $options: 'i' } },
-        { phno: { $regex: q, $options: 'i' } },
-        { role: { $regex: q, $options: 'i' } },
-        { companyName: { $regex: q, $options: 'i' } },
-      ];
+      conditions.push({
+        $or: [
+          { name: { $regex: q, $options: 'i' } },
+          { email: { $regex: q, $options: 'i' } },
+          { phno: { $regex: q, $options: 'i' } },
+          { role: { $regex: q, $options: 'i' } },
+          { companyName: { $regex: q, $options: 'i' } },
+        ],
+      });
     }
+
+    const filter = conditions.length > 0 ? { $and: conditions } : {};
 
     // Sorting
     let sortOption: Record<string, 1 | -1> = { createdAt: -1 };
@@ -87,14 +103,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // Lookup company if companyName missing
-    if (!companyName || !companyName.trim()) {
-      const company = await RecruitingCompany.findById(companyId);
-      if (!company) {
-        return NextResponse.json({ error: 'Company not found' }, { status: 404 });
-      }
-      companyName = company.name;
+    // Verify company exists and belongs to the recruiter
+    const company = await RecruitingCompany.findById(companyId);
+    if (!company) {
+      return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     }
+
+    if (payload.role === 'recruiter' && company.createdBy?.toString() !== payload.id) {
+      return NextResponse.json(
+        { error: 'Forbidden: You cannot add candidates to another recruiter\'s company' },
+        { status: 403 }
+      );
+    }
+
+    companyName = company.name;
 
     // Validate status
     if (!status || !CANDIDATE_STATUSES.includes(status as CandidateStatus)) {

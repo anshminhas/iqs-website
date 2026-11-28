@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/utils/db';
 import Candidate, { CANDIDATE_STATUSES, CandidateStatus } from '@/models/Candidate';
+import RecruitingCompany from '@/models/RecruitingCompany';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/utils/jwt';
 
@@ -21,6 +22,22 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { id } = await params;
+
+    const candidate = await Candidate.findById(id);
+    if (!candidate) {
+      return NextResponse.json({ error: 'Candidate not found' }, { status: 404 });
+    }
+
+    if (payload.role === 'recruiter') {
+      const isCreator = candidate.createdBy?.toString() === payload.id;
+      if (!isCreator) {
+        const company = await RecruitingCompany.findOne({ _id: candidate.companyId, createdBy: payload.id });
+        if (!company) {
+          return NextResponse.json({ error: 'Forbidden: Access denied' }, { status: 403 });
+        }
+      }
+    }
+
     const body = await req.json();
 
     const updateFields: Record<string, any> = {};
@@ -60,6 +77,22 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { id } = await params;
+
+    const candidate = await Candidate.findById(id);
+    if (!candidate) {
+      return NextResponse.json({ error: 'Candidate not found' }, { status: 404 });
+    }
+
+    if (payload.role === 'recruiter') {
+      const isCreator = candidate.createdBy?.toString() === payload.id;
+      if (!isCreator) {
+        const company = await RecruitingCompany.findOne({ _id: candidate.companyId, createdBy: payload.id });
+        if (!company) {
+          return NextResponse.json({ error: 'Forbidden: Access denied' }, { status: 403 });
+        }
+      }
+    }
+
     const deleted = await Candidate.findByIdAndDelete(id);
     if (!deleted) {
       return NextResponse.json({ error: 'Candidate not found' }, { status: 404 });
