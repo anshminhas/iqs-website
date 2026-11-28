@@ -28,7 +28,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ companyI
     }
 
     // Recruiters can only access companies they created
-    if (payload.role === 'recruiter' && company.createdBy?.toString() !== payload.id) {
+    const creatorId = String(company.createdBy?._id || company.createdBy || '');
+    if (payload.role === 'recruiter' && creatorId !== String(payload.id)) {
       return NextResponse.json({ error: 'Company not found or access denied' }, { status: 404 });
     }
 
@@ -61,7 +62,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ compa
     }
 
     // Only creator recruiter or super_admin can delete
-    if (payload.role === 'recruiter' && company.createdBy?.toString() !== payload.id) {
+    const creatorId = String(company.createdBy?._id || company.createdBy || '');
+    if (payload.role === 'recruiter' && creatorId !== String(payload.id)) {
       return NextResponse.json({ error: 'Forbidden: Access denied' }, { status: 403 });
     }
 

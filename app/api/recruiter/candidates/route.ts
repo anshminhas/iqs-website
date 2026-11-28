@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectToDatabase from '@/utils/db';
 import Candidate, { CANDIDATE_STATUSES, CandidateStatus } from '@/models/Candidate';
 import RecruitingCompany from '@/models/RecruitingCompany';
@@ -31,17 +32,33 @@ export async function GET(req: Request) {
 
     if (companyId) {
       if (payload.role === 'recruiter') {
-        const company = await RecruitingCompany.findOne({ _id: companyId, createdBy: payload.id });
+        const userObjId = mongoose.Types.ObjectId.isValid(payload.id)
+          ? new mongoose.Types.ObjectId(payload.id)
+          : payload.id;
+        const company = await RecruitingCompany.findOne({
+          _id: companyId,
+          $or: [{ createdBy: payload.id }, { createdBy: userObjId }],
+        });
         if (!company) {
           return NextResponse.json({ error: 'Company not found or access denied' }, { status: 404 });
         }
       }
       conditions.push({ companyId });
     } else if (payload.role === 'recruiter') {
-      const myCompanies = await RecruitingCompany.find({ createdBy: payload.id }, { _id: 1 }).lean();
+      const userObjId = mongoose.Types.ObjectId.isValid(payload.id)
+        ? new mongoose.Types.ObjectId(payload.id)
+        : payload.id;
+      const myCompanies = await RecruitingCompany.find(
+        { $or: [{ createdBy: payload.id }, { createdBy: userObjId }] },
+        { _id: 1 }
+      ).lean();
       const myCompanyIds = myCompanies.map((c: any) => c._id);
       conditions.push({
-        $or: [{ createdBy: payload.id }, { companyId: { $in: myCompanyIds } }],
+        $or: [
+          { createdBy: payload.id },
+          { createdBy: userObjId },
+          { companyId: { $in: myCompanyIds } },
+        ],
       });
     }
 
@@ -109,7 +126,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     }
 
-    if (payload.role === 'recruiter' && company.createdBy?.toString() !== payload.id) {
+    const creatorId = String(company.createdBy?._id || company.createdBy || '');
+    if (payload.role === 'recruiter' && creatorId !== String(payload.id)) {
       return NextResponse.json(
         { error: 'Forbidden: You cannot add candidates to another recruiter\'s company' },
         { status: 403 }

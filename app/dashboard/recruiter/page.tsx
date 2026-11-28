@@ -20,6 +20,7 @@ import {
   ChevronRight,
   TrendingUp,
   X,
+  Trash2,
 } from 'lucide-react';
 
 interface Company {
@@ -53,6 +54,32 @@ export default function RecruiterDashboard() {
     description: '',
   });
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Delete Company Modal state
+  const [deleteModalCompany, setDeleteModalCompany] = useState<Company | null>(null);
+  const [deletingCompany, setDeletingCompany] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  const handleDeleteCompany = async () => {
+    if (!deleteModalCompany) return;
+    setDeletingCompany(true);
+    setDeleteError('');
+    try {
+      const res = await fetchWithAuth(`/api/recruiter/companies/${deleteModalCompany._id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete company');
+      }
+      setCompanies((prev) => prev.filter((c) => c._id !== deleteModalCompany._id));
+      setDeleteModalCompany(null);
+    } catch (err: any) {
+      setDeleteError(err.message || 'Error deleting company');
+    } finally {
+      setDeletingCompany(false);
+    }
+  };
 
   const loadCompanies = async () => {
     try {
@@ -246,9 +273,23 @@ export default function RecruiterDashboard() {
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-black text-lg flex items-center justify-center uppercase shadow-md shadow-purple-500/20">
                         {comp.name.substring(0, 2)}
                       </div>
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs font-bold">
-                        <Users className="w-3.5 h-3.5" />
-                        <span>{comp.candidateCount || 0} Candidates</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs font-bold">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>{comp.candidateCount || 0} Candidates</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setDeleteModalCompany(comp);
+                          }}
+                          className="p-1.5 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all opacity-70 group-hover:opacity-100"
+                          title={`Delete ${comp.name}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
 
@@ -402,6 +443,57 @@ export default function RecruiterDashboard() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+        {/* Modal: Delete Confirmation */}
+        {deleteModalCompany && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-2xl max-w-md w-full p-6 relative animate-in zoom-in-95 duration-200">
+              <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center mb-4">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">
+                Delete &ldquo;{deleteModalCompany.name}&rdquo;?
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+                Are you sure you want to delete this company? All candidate records ({deleteModalCompany.candidateCount || 0} candidates) associated with this company will also be permanently deleted. This action cannot be undone.
+              </p>
+
+              {deleteError && (
+                <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold border border-red-100 dark:border-red-800">
+                  {deleteError}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  disabled={deletingCompany}
+                  onClick={() => {
+                    setDeleteModalCompany(null);
+                    setDeleteError('');
+                  }}
+                  className="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={deletingCompany}
+                  onClick={handleDeleteCompany}
+                  className="px-5 py-2.5 rounded-xl text-sm font-bold bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white shadow-md shadow-red-500/20 active:scale-95 transition-all flex items-center gap-2"
+                >
+                  {deletingCompany ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    'Yes, Delete Company'
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         )}

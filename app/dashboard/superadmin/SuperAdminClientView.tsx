@@ -19,7 +19,8 @@ import {
   Mail,
   CheckCircle2,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Trash2
 } from 'lucide-react';
 import Link from 'next/link';
 import { createAdmin, createClient, assignClientToAdmin, updateClientCategories } from '@/app/actions/superadmin.actions';
@@ -87,6 +88,66 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
       setPwdMsg({ type: 'error', text: err.message });
     } finally {
       setPwdLoading(false);
+    }
+  };
+
+  // User deletion state
+  const [deleteUserTarget, setDeleteUserTarget] = useState<{
+    id: string;
+    name: string;
+    email?: string;
+    type: 'admin' | 'recruiter' | 'client';
+  } | null>(null);
+  const [deletingUser, setDeletingUser] = useState(false);
+  const [deleteUserError, setDeleteUserError] = useState('');
+
+  const handleDeleteUser = async () => {
+    if (!deleteUserTarget) return;
+    setDeletingUser(true);
+    setDeleteUserError('');
+    try {
+      const res = await fetch(`/api/superadmin/users/${deleteUserTarget.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || 'Failed to delete user');
+      }
+
+      // Update local state
+      if (deleteUserTarget.type === 'admin') {
+        setData((prev: any) => ({
+          ...prev,
+          admins: prev.admins.filter((a: any) => String(a._id || a.id) !== String(deleteUserTarget.id)),
+        }));
+      } else if (deleteUserTarget.type === 'recruiter') {
+        setData((prev: any) => ({
+          ...prev,
+          recruiters: (prev.recruiters || []).filter((r: any) => String(r._id || r.id) !== String(deleteUserTarget.id)),
+        }));
+        setRecOverview((prev: any) =>
+          prev
+            ? {
+                ...prev,
+                recruiters: (prev.recruiters || []).filter(
+                  (r: any) => String(r._id || r.id) !== String(deleteUserTarget.id)
+                ),
+              }
+            : prev
+        );
+      } else if (deleteUserTarget.type === 'client') {
+        setData((prev: any) => ({
+          ...prev,
+          clients: prev.clients.filter((c: any) => String(c._id || c.id) !== String(deleteUserTarget.id)),
+        }));
+      }
+
+      setDeleteUserTarget(null);
+    } catch (err: any) {
+      setDeleteUserError(err.message || 'Error deleting user');
+    } finally {
+      setDeletingUser(false);
     }
   };
 
@@ -404,22 +465,37 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
               </h3>
               <ul className="space-y-3 relative z-20">
                 {data.admins.map((a: any) => (
-                  <li key={a._id || a.id}>
+                  <li key={a._id || a.id} className="flex items-center gap-2">
                     <Link 
                       href={`/dashboard/superadmin/admin/${a._id || a.id}`}
-                      className="flex items-center justify-between p-5 rounded-[2rem] bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1 transition-all group border border-transparent hover:border-indigo-100 cursor-pointer"
+                      className="flex-1 min-w-0 flex items-center justify-between p-4 rounded-[1.75rem] bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-0.5 transition-all group border border-transparent hover:border-indigo-100 cursor-pointer"
                     >
-                      <div className="min-w-0 flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xs uppercase">
+                      <div className="min-w-0 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xs uppercase flex-shrink-0">
                           {a.name.substring(0, 2)}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="font-black text-sm truncate uppercase tracking-tight">{a.name}</p>
                           <p className="text-[10px] text-gray-400 font-bold truncate uppercase tracking-tight">{a.email}</p>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-200 group-hover:text-indigo-500 transition-all group-hover:translate-x-1" />
+                      <ChevronRight className="w-5 h-5 text-gray-200 group-hover:text-indigo-500 transition-all group-hover:translate-x-1 flex-shrink-0" />
                     </Link>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDeleteUserTarget({
+                          id: a._id || a.id,
+                          name: a.name,
+                          email: a.email,
+                          type: 'admin',
+                        })
+                      }
+                      className="p-3 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all flex-shrink-0"
+                      title={`Delete Administrator ${a.name}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -437,27 +513,42 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
                   </li>
                 ) : (
                   data.recruiters.map((r: any) => (
-                    <li key={r._id || r.id}>
+                    <li key={r._id || r.id} className="flex items-center gap-2">
                       <Link
                         href={`/dashboard/superadmin/recruiter/${r._id || r.id}`}
-                        className="flex items-center justify-between p-5 rounded-[2rem] bg-gray-50/50 border border-transparent hover:border-purple-100 hover:bg-white hover:shadow-xl hover:shadow-purple-500/5 hover:-translate-y-1 transition-all group cursor-pointer"
+                        className="flex-1 min-w-0 flex items-center justify-between p-4 rounded-[1.75rem] bg-gray-50/50 border border-transparent hover:border-purple-100 hover:bg-white hover:shadow-xl hover:shadow-purple-500/5 hover:-translate-y-0.5 transition-all group cursor-pointer"
                       >
-                        <div className="min-w-0 flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-xs uppercase">
+                        <div className="min-w-0 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-xs uppercase flex-shrink-0">
                             {r.name.substring(0, 2)}
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <p className="font-black text-sm truncate uppercase tracking-tight">{r.name}</p>
                             <p className="text-[10px] text-gray-400 font-bold truncate uppercase tracking-tight">{r.email}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full">
                             Recruiter
                           </span>
                           <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
                         </div>
                       </Link>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDeleteUserTarget({
+                            id: r._id || r.id,
+                            name: r.name,
+                            email: r.email,
+                            type: 'recruiter',
+                          })
+                        }
+                        className="p-3 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all flex-shrink-0"
+                        title={`Delete Recruiter ${r.name}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </li>
                   ))
                 )}
@@ -471,25 +562,40 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
               </h3>
               <ul className="space-y-3 relative z-20">
                 {data.clients.map((c: any) => (
-                  <li key={c._id || c.id}>
+                  <li key={c._id || c.id} className="flex items-center gap-2">
                     <Link 
                       href={`/dashboard/superadmin/client/${c._id || c.id}`}
-                      className="flex items-center justify-between p-5 rounded-[2rem] bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-emerald-500/5 hover:-translate-y-1 transition-all group border border-transparent hover:border-emerald-100 cursor-pointer"
+                      className="flex-1 min-w-0 flex items-center justify-between p-4 rounded-[1.75rem] bg-gray-50/50 hover:bg-white hover:shadow-xl hover:shadow-emerald-500/5 hover:-translate-y-0.5 transition-all group border border-transparent hover:border-emerald-100 cursor-pointer"
                     >
-                      <div className="min-w-0 flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xs uppercase">
+                      <div className="min-w-0 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xs uppercase flex-shrink-0">
                           {c.companyName.substring(0, 2)}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="font-black text-sm truncate uppercase tracking-tight">{c.companyName}</p>
                           <p className="text-[10px] text-gray-400 font-bold truncate uppercase tracking-tight">{c.contactEmail}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         <span className="text-[9px] font-black uppercase tracking-widest text-gray-300 group-hover:text-emerald-500 transition-colors">Audit</span>
                         <ExternalLink className="w-4 h-4 text-gray-200 group-hover:text-emerald-500 transition-all" />
                       </div>
                     </Link>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDeleteUserTarget({
+                          id: c._id || c.id,
+                          name: c.companyName,
+                          email: c.contactEmail,
+                          type: 'client',
+                        })
+                      }
+                      className="p-3 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all flex-shrink-0"
+                      title={`Delete Client ${c.companyName}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -624,13 +730,30 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
                       </div>
                     </div>
 
-                    <Link
-                      href={`/dashboard/superadmin/recruiter/${r._id}`}
-                      className="w-full py-2.5 bg-white dark:bg-gray-800 hover:bg-purple-600 hover:text-white text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm group"
-                    >
-                      <span>View All Companies & Candidates</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/dashboard/superadmin/recruiter/${r._id}`}
+                        className="flex-1 py-2.5 bg-white dark:bg-gray-800 hover:bg-purple-600 hover:text-white text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm group"
+                      >
+                        <span>View All Companies & Candidates</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDeleteUserTarget({
+                            id: r._id,
+                            name: r.name,
+                            email: r.email,
+                            type: 'recruiter',
+                          })
+                        }
+                        className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl border border-gray-200 dark:border-gray-700 transition-all"
+                        title={`Delete Recruiter ${r.name}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -905,6 +1028,62 @@ export default function SuperAdminClientView({ initialData }: { initialData: any
                 </div>
               </div>
             )) : <div className="p-20 text-center text-gray-300 font-black uppercase italic tracking-widest">Registry Synchronization Clear</div>}
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Delete User Confirmation */}
+      {deleteUserTarget && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl border border-gray-100 shadow-2xl max-w-md w-full p-6 relative animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mb-4">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-black text-gray-900 mb-2">
+              Delete {deleteUserTarget.type === 'recruiter' ? 'Recruiter' : deleteUserTarget.type === 'admin' ? 'Administrator' : 'Client Profile'}?
+            </h3>
+            <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+              Are you sure you want to delete <span className="font-bold text-gray-900">&ldquo;{deleteUserTarget.name}&rdquo;</span>
+              {deleteUserTarget.email ? ` (${deleteUserTarget.email})` : ''}?
+              {deleteUserTarget.type === 'recruiter' && ' This will permanently remove this recruiter and all partner companies and candidates created under their account.'}
+              {deleteUserTarget.type === 'client' && ' This will remove the client profile and disable client portal access.'}
+              {deleteUserTarget.type === 'admin' && ' This administrator will no longer have access to the administrative system.'}
+            </p>
+
+            {deleteUserError && (
+              <div className="mb-4 p-3 rounded-xl bg-red-50 text-red-600 text-xs font-bold border border-red-100">
+                {deleteUserError}
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                disabled={deletingUser}
+                onClick={() => {
+                  setDeleteUserTarget(null);
+                  setDeleteUserError('');
+                }}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:text-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deletingUser}
+                onClick={handleDeleteUser}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white shadow-md shadow-red-500/20 active:scale-95 transition-all flex items-center gap-2"
+              >
+                {deletingUser ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  'Yes, Delete Account'
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

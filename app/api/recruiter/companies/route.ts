@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectToDatabase from '@/utils/db';
 import RecruitingCompany from '@/models/RecruitingCompany';
 import Candidate from '@/models/Candidate';
@@ -22,7 +23,15 @@ export async function GET() {
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // Fetch companies: recruiters only see companies they created; super_admins see all
-    const query = payload.role === 'recruiter' ? { createdBy: payload.id } : {};
+    let query: Record<string, any> = {};
+    if (payload.role === 'recruiter') {
+      const userObjId = mongoose.Types.ObjectId.isValid(payload.id)
+        ? new mongoose.Types.ObjectId(payload.id)
+        : payload.id;
+      query = {
+        $or: [{ createdBy: payload.id }, { createdBy: userObjId }],
+      };
+    }
     const companies = await RecruitingCompany.find(query)
       .sort({ createdAt: -1 })
       .lean();

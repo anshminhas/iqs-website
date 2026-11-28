@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import connectToDatabase from '@/utils/db';
 import Candidate, { CANDIDATE_STATUSES, CandidateStatus } from '@/models/Candidate';
 import RecruitingCompany from '@/models/RecruitingCompany';
@@ -29,9 +30,16 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
 
     if (payload.role === 'recruiter') {
-      const isCreator = candidate.createdBy?.toString() === payload.id;
+      const creatorId = String(candidate.createdBy?._id || candidate.createdBy || '');
+      const isCreator = creatorId === String(payload.id);
       if (!isCreator) {
-        const company = await RecruitingCompany.findOne({ _id: candidate.companyId, createdBy: payload.id });
+        const userObjId = mongoose.Types.ObjectId.isValid(payload.id)
+          ? new mongoose.Types.ObjectId(payload.id)
+          : payload.id;
+        const company = await RecruitingCompany.findOne({
+          _id: candidate.companyId,
+          $or: [{ createdBy: payload.id }, { createdBy: userObjId }],
+        });
         if (!company) {
           return NextResponse.json({ error: 'Forbidden: Access denied' }, { status: 403 });
         }
@@ -84,9 +92,16 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     }
 
     if (payload.role === 'recruiter') {
-      const isCreator = candidate.createdBy?.toString() === payload.id;
+      const creatorId = String(candidate.createdBy?._id || candidate.createdBy || '');
+      const isCreator = creatorId === String(payload.id);
       if (!isCreator) {
-        const company = await RecruitingCompany.findOne({ _id: candidate.companyId, createdBy: payload.id });
+        const userObjId = mongoose.Types.ObjectId.isValid(payload.id)
+          ? new mongoose.Types.ObjectId(payload.id)
+          : payload.id;
+        const company = await RecruitingCompany.findOne({
+          _id: candidate.companyId,
+          $or: [{ createdBy: payload.id }, { createdBy: userObjId }],
+        });
         if (!company) {
           return NextResponse.json({ error: 'Forbidden: Access denied' }, { status: 403 });
         }

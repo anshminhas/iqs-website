@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/context/AuthContext';
 import AuthBoundary from '@/src/components/auth/AuthBoundary';
 import {
@@ -81,11 +82,35 @@ export default function CompanyCandidateTrackerPage({
 }) {
   const { companyId } = use(params);
   const { isAuthInitialized, fetchWithAuth } = useAuth();
+  const router = useRouter();
 
   const [company, setCompany] = useState<Company | null>(null);
   const [accessDenied, setAccessDenied] = useState(false);
   const [candidates, setCandidates] = useState<CandidateItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Delete Company Modal state
+  const [showDeleteCompanyModal, setShowDeleteCompanyModal] = useState(false);
+  const [deletingCompany, setDeletingCompany] = useState(false);
+  const [deleteCompanyError, setDeleteCompanyError] = useState('');
+
+  const handleDeleteCurrentCompany = async () => {
+    setDeletingCompany(true);
+    setDeleteCompanyError('');
+    try {
+      const res = await fetchWithAuth(`/api/recruiter/companies/${companyId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete company');
+      }
+      router.push('/dashboard/recruiter');
+    } catch (err: any) {
+      setDeleteCompanyError(err.message || 'Error deleting company');
+      setDeletingCompany(false);
+    }
+  };
 
   // Filters & Sorting
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -374,6 +399,13 @@ export default function CompanyCandidateTrackerPage({
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowDeleteCompanyModal(true)}
+              className="px-4 py-3.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-2xl font-bold text-sm flex items-center gap-2 border border-red-200 dark:border-red-800 transition-all active:scale-95"
+              title="Delete this company"
+            >
+              <Trash2 className="w-4 h-4" /> Delete Company
+            </button>
             <button
               onClick={() => setShowModal(true)}
               className="px-6 py-3.5 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-black text-sm uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-purple-200 dark:shadow-purple-900/20 active:scale-95 transition-all"
@@ -886,6 +918,57 @@ export default function CompanyCandidateTrackerPage({
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+        {/* Modal: Delete Current Company */}
+        {showDeleteCompanyModal && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-2xl max-w-md w-full p-6 relative animate-in zoom-in-95 duration-200">
+              <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center mb-4">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">
+                Delete &ldquo;{company?.name}&rdquo;?
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+                Are you sure you want to delete this company? All candidate records ({candidates.length} candidates) tracked under this company will also be permanently deleted.
+              </p>
+
+              {deleteCompanyError && (
+                <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold border border-red-100 dark:border-red-800">
+                  {deleteCompanyError}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  disabled={deletingCompany}
+                  onClick={() => {
+                    setShowDeleteCompanyModal(false);
+                    setDeleteCompanyError('');
+                  }}
+                  className="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={deletingCompany}
+                  onClick={handleDeleteCurrentCompany}
+                  className="px-5 py-2.5 rounded-xl text-sm font-bold bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white shadow-md shadow-red-500/20 active:scale-95 transition-all flex items-center gap-2"
+                >
+                  {deletingCompany ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    'Yes, Delete Company'
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         )}
