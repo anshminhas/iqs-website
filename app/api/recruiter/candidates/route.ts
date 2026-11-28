@@ -6,6 +6,9 @@ import RecruitingCompany from '@/models/RecruitingCompany';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/utils/jwt';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getAuthPayload() {
   const cookieStore = await cookies();
   const token = cookieStore.get('dms_auth')?.value;
@@ -43,7 +46,12 @@ export async function GET(req: Request) {
           return NextResponse.json({ error: 'Company not found or access denied' }, { status: 404 });
         }
       }
-      conditions.push({ companyId });
+      const compObjId = mongoose.Types.ObjectId.isValid(companyId)
+        ? new mongoose.Types.ObjectId(companyId)
+        : companyId;
+      conditions.push({
+        $or: [{ companyId }, { companyId: compObjId }],
+      });
     } else if (payload.role === 'recruiter') {
       const userObjId = mongoose.Types.ObjectId.isValid(payload.id)
         ? new mongoose.Types.ObjectId(payload.id)
@@ -97,7 +105,17 @@ export async function GET(req: Request) {
 
     const candidates = await Candidate.find(filter).sort(sortOption).lean();
 
-    return NextResponse.json({ candidates }, { status: 200 });
+    return NextResponse.json(
+      { candidates },
+      {
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to fetch candidates' }, { status: 500 });
   }
@@ -141,17 +159,24 @@ export async function POST(req: Request) {
       status = 'Applied';
     }
 
+    const userObjId = mongoose.Types.ObjectId.isValid(payload.id)
+      ? new mongoose.Types.ObjectId(payload.id)
+      : payload.id;
+    const compObjId = mongoose.Types.ObjectId.isValid(companyId)
+      ? new mongoose.Types.ObjectId(companyId)
+      : companyId;
+
     const candidate = new Candidate({
       name: name.trim(),
       phno: phno.trim(),
       email: email.trim(),
       role: role.trim(),
-      companyId,
+      companyId: compObjId,
       companyName: companyName.trim(),
       status,
       joiningDate: joiningDate?.trim() || '',
       notes: notes?.trim() || '',
-      createdBy: payload.id,
+      createdBy: userObjId,
     });
 
     await candidate.save();

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/src/context/AuthContext';
 import AuthBoundary from '@/src/components/auth/AuthBoundary';
@@ -21,6 +21,8 @@ import {
   TrendingUp,
   X,
   Trash2,
+  Lock,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface Company {
@@ -34,14 +36,15 @@ interface Company {
   activeCount?: number;
   selectedCount?: number;
   createdAt: string;
+  createdBy?: any;
 }
 
 export default function RecruiterDashboard() {
-  const { isAuthInitialized, fetchWithAuth } = useAuth();
+  const { isAuthInitialized, fetchWithAuth, user } = useAuth();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const dataFetched = useRef(false);
+  const lastLoadedUser = useRef<string | null>(null);
 
   // New Company Modal state
   const [showModal, setShowModal] = useState(false);
@@ -81,10 +84,10 @@ export default function RecruiterDashboard() {
     }
   };
 
-  const loadCompanies = async () => {
+  const loadCompanies = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetchWithAuth('/api/recruiter/companies');
+      const res = await fetchWithAuth('/api/recruiter/companies', { cache: 'no-store' });
       const data = await res.json();
       if (res.ok) {
         setCompanies(data.companies || []);
@@ -94,13 +97,16 @@ export default function RecruiterDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchWithAuth]);
 
   useEffect(() => {
-    if (!isAuthInitialized || dataFetched.current) return;
-    dataFetched.current = true;
-    loadCompanies();
-  }, [isAuthInitialized, fetchWithAuth]);
+    if (!isAuthInitialized) return;
+    const currentUserId = user?.id || user?._id || user?.email || 'anon';
+    if (lastLoadedUser.current !== currentUserId) {
+      lastLoadedUser.current = currentUserId;
+      loadCompanies();
+    }
+  }, [isAuthInitialized, user, loadCompanies]);
 
   const handleCreateCompany = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,6 +176,39 @@ export default function RecruiterDashboard() {
             <Plus className="w-5 h-5" /> Add Partner Company
           </button>
         </div>
+
+        {/* Workspace Scope Banner */}
+        {user?.role === 'recruiter' && (
+          <div className="flex items-center gap-3 px-4 py-3 bg-blue-50/80 dark:bg-blue-900/20 border border-blue-200/80 dark:border-blue-800/60 rounded-2xl text-xs text-blue-900 dark:text-blue-200 shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center flex-shrink-0 text-blue-600 dark:text-blue-400">
+              <Lock className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-bold text-sm">
+                Private Recruiter Workspace: <span className="text-purple-600 dark:text-purple-400">{user?.name || user?.email}</span>
+              </p>
+              <p className="text-blue-700 dark:text-blue-300 mt-0.5">
+                Strict workspace isolation active. You only see companies and candidate pipelines created under your recruiter account.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {user?.role === 'super_admin' && (
+          <div className="flex items-center gap-3 px-4 py-3 bg-purple-50/80 dark:bg-purple-900/20 border border-purple-200/80 dark:border-purple-800/60 rounded-2xl text-xs text-purple-900 dark:text-purple-200 shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center flex-shrink-0 text-purple-600 dark:text-purple-400">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-bold text-sm">
+                Super Admin Global View: <span className="text-purple-600 dark:text-purple-400">All Recruiter Companies</span>
+              </p>
+              <p className="text-purple-700 dark:text-purple-300 mt-0.5">
+                Viewing all companies across all recruiters. Log in with individual recruiter accounts to verify private recruiter isolation.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Stats Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -297,6 +336,11 @@ export default function RecruiterDashboard() {
                       <h3 className="text-xl font-black text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                         {comp.name}
                       </h3>
+                      {comp.createdBy && typeof comp.createdBy === 'object' && (comp.createdBy.name || comp.createdBy.email) && (
+                        <div className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-1 mt-0.5">
+                          <span>Created by: {comp.createdBy.name || comp.createdBy.email}</span>
+                        </div>
+                      )}
                       {comp.description && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                           {comp.description}

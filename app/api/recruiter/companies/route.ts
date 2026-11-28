@@ -6,6 +6,9 @@ import Candidate from '@/models/Candidate';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/utils/jwt';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getAuthPayload() {
   const cookieStore = await cookies();
   const token = cookieStore.get('dms_auth')?.value;
@@ -34,6 +37,7 @@ export async function GET() {
     }
     const companies = await RecruitingCompany.find(query)
       .sort({ createdAt: -1 })
+      .populate('createdBy', 'name email')
       .lean();
 
     // Attach candidate counts and stats per company
@@ -57,7 +61,17 @@ export async function GET() {
       })
     );
 
-    return NextResponse.json({ companies: companiesWithStats }, { status: 200 });
+    return NextResponse.json(
+      { companies: companiesWithStats },
+      {
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to fetch companies' }, { status: 500 });
   }
@@ -76,13 +90,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Company name is required' }, { status: 400 });
     }
 
+    const userObjId = mongoose.Types.ObjectId.isValid(payload.id)
+      ? new mongoose.Types.ObjectId(payload.id)
+      : payload.id;
+
     const company = new RecruitingCompany({
       name: name.trim(),
       industry: industry?.trim() || '',
       location: location?.trim() || '',
       website: website?.trim() || '',
       description: description?.trim() || '',
-      createdBy: payload.id,
+      createdBy: userObjId,
     });
 
     await company.save();

@@ -33,14 +33,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     } catch (e) {}
-    router.push('/login');
-    router.refresh();
-  }, [router]);
+    // Full hard redirect to flush all React and router state
+    window.location.href = '/login';
+  }, []);
 
   const fetchWithAuth = useCallback(async (url: string, options?: RequestInit) => {
-    const fetchOptions = {
+    const fetchOptions: RequestInit = {
       ...options,
-      credentials: 'include' as RequestCredentials,
+      credentials: 'include',
+      cache: options?.cache || 'no-store',
+      headers: {
+        ...options?.headers,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+      },
     };
     const res = await fetch(url, fetchOptions);
     if (res.status === 401) {

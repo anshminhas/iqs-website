@@ -6,6 +6,9 @@ import RecruitingCompany from '@/models/RecruitingCompany';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/utils/jwt';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getAuthPayload() {
   const cookieStore = await cookies();
   const token = cookieStore.get('dms_auth')?.value;

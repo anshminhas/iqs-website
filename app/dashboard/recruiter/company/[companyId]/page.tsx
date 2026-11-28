@@ -35,6 +35,7 @@ interface Company {
   location?: string;
   website?: string;
   description?: string;
+  createdBy?: any;
 }
 
 const STATUS_COLORS: Record<CandidateStatus, { bg: string; text: string; border: string }> = {
@@ -146,7 +147,7 @@ export default function CompanyCandidateTrackerPage({
   // Fetch Company
   const loadCompany = useCallback(async () => {
     try {
-      const res = await fetchWithAuth(`/api/recruiter/companies/${companyId}`);
+      const res = await fetchWithAuth(`/api/recruiter/companies/${companyId}`, { cache: 'no-store' });
       const data = await res.json();
       if (res.ok && data.company) {
         setCompany(data.company);
@@ -170,7 +171,7 @@ export default function CompanyCandidateTrackerPage({
       if (sortBy) url.searchParams.set('sort', sortBy);
       if (searchQuery.trim()) url.searchParams.set('search', searchQuery.trim());
 
-      const res = await fetchWithAuth(url.pathname + url.search);
+      const res = await fetchWithAuth(url.pathname + url.search, { cache: 'no-store' });
       const data = await res.json();
       if (res.ok) {
         setCandidates(data.candidates || []);
@@ -390,6 +391,11 @@ export default function CompanyCandidateTrackerPage({
               <h1 className="text-3xl font-black text-gray-900 dark:text-white font-montserrat tracking-tight uppercase italic">
                 {company ? company.name : 'Loading Company...'}
               </h1>
+              {company?.createdBy && typeof company.createdBy === 'object' && (company.createdBy.name || company.createdBy.email) && (
+                <div className="text-xs font-semibold text-purple-600 dark:text-purple-400 mt-1 flex items-center gap-1.5">
+                  <span>Recruiter: {company.createdBy.name || company.createdBy.email}</span>
+                </div>
+              )}
               {company?.description && (
                 <p className="text-gray-500 dark:text-gray-400 text-xs mt-1 font-medium max-w-2xl">
                   {company.description}

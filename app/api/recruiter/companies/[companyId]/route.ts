@@ -5,6 +5,9 @@ import Candidate from '@/models/Candidate';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/utils/jwt';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getAuthPayload() {
   const cookieStore = await cookies();
   const token = cookieStore.get('dms_auth')?.value;
@@ -22,7 +25,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ companyI
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { companyId } = await params;
-    const company = await RecruitingCompany.findById(companyId).lean();
+    const company = await RecruitingCompany.findById(companyId)
+      .populate('createdBy', 'name email')
+      .lean();
     if (!company) {
       return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     }
@@ -42,7 +47,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ companyI
           candidateCount,
         },
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      }
     );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to fetch company' }, { status: 500 });
